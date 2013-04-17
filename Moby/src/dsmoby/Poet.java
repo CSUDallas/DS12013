@@ -47,7 +47,7 @@ public class Poet {
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
 		//moby.printAllWords();
-	}
+	}// hello
 	
 	
 	public static String writeIambicPoemDumb(int iambs, int lines){
