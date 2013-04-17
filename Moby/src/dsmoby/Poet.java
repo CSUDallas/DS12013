@@ -16,7 +16,7 @@ public class Poet {
 		System.out.println(moby.getAllPhones("He walked the dog very far"));
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
-		moby.printAllWords();
+		//moby.printAllWords();
 	}
 	
 	
