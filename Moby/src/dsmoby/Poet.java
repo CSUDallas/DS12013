@@ -31,6 +31,8 @@ package dsmoby;
 public class Poet {
 	private static Moby 			moby;
 	
+	// This is a wonderful comment!
+	
 	public static void main(String[] args){
 		moby = new Moby("cmupronRand.txt", 
 				"mpos.txt",
