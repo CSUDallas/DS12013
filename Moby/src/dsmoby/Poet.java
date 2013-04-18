@@ -27,7 +27,7 @@
 ———————————♥
 */
 package dsmoby;
-//look i added something very special
+//look i added something very special, more special than you can imagine
 public class Poet {
 	private static Moby moby;
 	
