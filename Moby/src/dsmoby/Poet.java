@@ -29,7 +29,7 @@
 package dsmoby;
 
 public class Poet {
-	private static Moby 			moby;
+	private static Moby moby;
 	
 	// This is a wonderful comment!
 	
