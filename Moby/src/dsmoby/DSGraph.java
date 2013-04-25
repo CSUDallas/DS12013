@@ -65,7 +65,29 @@ public class DSGraph {
 	 * there is no vertex with that label
 	 */
 	private DSVertex vertexWithLabel(String label){
-		return new DSVertex();
+		DSElement<DSVertex> e = vertexList.first;
+		while(e != null){
+			if(e.getItem().label.compareTo(label) == 0)
+				return e.getItem();
+			e = e.getNext();
+		}
+		return null;
+	}
+	
+	public boolean numberOfEdges(){
+		return false;
+	}
+	
+	public boolean shortestPath(){
+		return false;
+	}
+	
+	public boolean isConnected(){
+		return false;
+	}
+	
+	public boolean isBipartite(){
+		return false;
 	}
 
 	/*

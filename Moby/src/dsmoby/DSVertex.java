@@ -1,9 +1,11 @@
 package dsmoby;
 
 public class DSVertex implements Comparable<DSVertex>{
-	String label;
-	DSLinkedList<DSVertex> neighbors;
-
+	public String label;
+	public DSLinkedList<DSVertex> neighbors;
+	public boolean visited;
+	public int color;
+	public int distance;
 	/*
 	 * Constructs an unlabeled vertex
 	 */
