@@ -3,13 +3,16 @@ package latina;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ServumVerbi {
 	DSLinkedList<Verbum> words; 
 	//DSBinaryTree<Verbum> wordTree; 
 	DSLinkedList<Terminus> inflects; 
+	int ft = 0, nft = 0;
 
-	public ServumVerbi(String dict, String flec) {
+	public ServumVerbi(String dict, String flec, String macron) {
 
 		// First we read the DICTLINE.GEN file, preferably randomized first
 		try { 
@@ -52,6 +55,86 @@ public class ServumVerbi {
 		//System.out.println(inflects.root.getItem().ending);
 		//inflects.root.getItem().print();
 		//inflects.first.getNext().getItem().print();
+
+		// Set the nominative form
+		testGetNom();
+		
+		// Now we read the macron file
+		int numFound = 0, numNotFound = 0;
+		try { 
+			FileReader f = new FileReader(macron);
+			BufferedReader reader = new BufferedReader(f);
+			String line = null;
+			String bothPattern = "entry.*key=\"([a-zA-Z]*).*<orth.*>\\p{P}*(\\p{L}+).*</orth>";
+	        Pattern bp = Pattern.compile(bothPattern);
+			String keyMatch = "", orthMatch = "";
+			String workingLine = "";
+			while ((line = reader.readLine()) != null) {
+				line = line.replace(" - ", "-");
+				line = line.replace("-", "");
+				workingLine = workingLine + line.trim();
+				Matcher m = bp.matcher(workingLine);
+				if(m.find()){
+					keyMatch  = m.group(1);
+					orthMatch = m.group(2);
+					boolean foundNomForm = processMacrons(keyMatch, orthMatch);
+					if(foundNomForm)
+						numFound++;	
+					else
+						numNotFound++;
+		        	workingLine = "";
+				}
+			}
+		} catch (IOException x) {
+			System.err.format("IOException: %s\n", x);
+		}
+		System.out.println("Done reading " + macron + " file");
+		System.out.println("Found " + numFound + ", failed to find: " + numNotFound);
+	}
+	
+	
+	/*
+	 * Forms the asterisked version of the orth string.
+	 * Searches for a Verbum whose nominative form equals the key.
+	 * If it finds it, sets its macrons field equal to the asterisked string.
+	 */
+	private boolean processMacrons(String key, String orth){
+		if(key.length() != orth.length()){	// This should never happen!
+			System.out.println("Different length! =" + key + "=, =" + orth + "=");
+			return false;
+		}
+		String macronForm = "";
+		for(int i = 0; i < key.length(); i++){
+			if(key.charAt(i) != orth.charAt(i))
+				macronForm = macronForm + "*" + key.charAt(i);
+			else
+				macronForm = macronForm + key.charAt(i);
+		}
+		//System.out.println(key + ", " + orth + ", " + macronForm);
+		Verbum v = findWordByNomForm(key);
+		if(v != null){
+			v.macrons = macronForm;
+			return true;
+		}
+		else{
+			//System.out.println("********** failed with " + key + ": " + nft);
+			return false;
+		}
+	}
+	
+	/*
+	 * Searches the words list for a Verbum whose nom field equals nomForm
+	 * XXX This would go quicker if we were in a binary tree...
+	 */
+	private Verbum findWordByNomForm(String nomForm){
+		DSElement<Verbum> e = words.first;
+		while(e != null){
+			if(e.getItem().nom.equals(nomForm))
+				return e.getItem();
+			else
+				e = e.getNext();
+		}
+		return null;
 	}
 
 	public Verbum getWord(){
@@ -88,7 +171,8 @@ public class ServumVerbi {
 			else 
 				freq = 'E'; // If missing feq data, just put very low - i.e. normally not called
 			//Names are not allowed to be retrieved here
-			if(w.getItem().pos.equals(pos) && Character.compare(freq, freqLevel) < 0 && Character.isLowerCase(w.getItem().form1.charAt(0)))
+			//if(w.getItem().pos.equals(pos) && Character.compare(freq, freqLevel) < 0 && Character.isLowerCase(w.getItem().form1.charAt(0)))
+			if(w.getItem().pos.equals(pos) && freq < freqLevel && Character.isLowerCase(w.getItem().form1.charAt(0)))
 				return w.getItem();
 			w = w.getNext();
 			if(w == null)
@@ -122,7 +206,7 @@ public class ServumVerbi {
 				freq = w.getItem().attribs.charAt(3);
 			else 
 				freq = 'E';
-			if(w.getItem().pos.equals("N") && Character.compare(freq, freqLevel) < 0 &&
+			if(w.getItem().pos.equals("N") && freq < freqLevel &&
 					Character.isUpperCase(w.getItem().form1.charAt(0))) //Check is first letter is capitalized
 				return w.getItem();
 			w = w.getNext();

@@ -22,7 +22,7 @@ public class LatinPoet {
 	private static Calendar rightNow;
 	public static void main(String[] args) {
 		sv = new ServumVerbi("DICTLINE.GEN",
-				"INFLECTS.LAT");
+				"INFLECTS.LAT", "LatinMacronFile.xml");
 
 		System.out.println();
 		System.out.println();
@@ -41,7 +41,9 @@ public class LatinPoet {
 		//writeLine(false);
 		//conjugate("ACTIVE", "IND");
 		// decline();
-		sv.testGetNom();
+		// XXX I moved "testGetNom()" into the constructor of the sv, since we
+		// XXX need it before we read the macron file, also in the constructor.
+		//sv.testGetNom();
 	}
 
 	
