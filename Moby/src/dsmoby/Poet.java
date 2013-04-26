@@ -43,10 +43,10 @@ public class Poet {
 		//String poem = writeIambicPoemRhyme(5, 14);	// Sonnet
 		//String poem = writeDoubleDactyl();
 		//System.out.println(poem);
-		System.out.println(moby.getAllPhones("He walked the dog very far"));
+		//System.out.println(moby.getAllPhones("He walked the dog very far"));
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
-		//moby.printAllWords();
+		moby.printAllWords();
 	}// hello
 	
 	
