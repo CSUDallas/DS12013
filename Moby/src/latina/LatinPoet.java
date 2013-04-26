@@ -14,6 +14,7 @@ import java.util.Calendar;
           PREP,      --  PREPosition
           CONJ,      --  CONJunction
           INTERJ,    --  INTERJection
+          /
  */
 public class LatinPoet {
 	private static ServumVerbi sv;
