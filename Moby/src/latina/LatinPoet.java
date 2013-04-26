@@ -20,8 +20,8 @@ public class LatinPoet {
 	private static int counter;
 	private static Calendar rightNow;
 	public static void main(String[] args) {
-		sv = new ServumVerbi("C:/Users/Joseph/Desktop/CS Project/DICTLINE.GEN",
-				"C:/Users/Joseph/Desktop/CS Project/INFLECTS.LAT");
+		sv = new ServumVerbi("DICTLINE.GEN",
+				"INFLECTS.LAT");
 
 		System.out.println();
 		System.out.println();
