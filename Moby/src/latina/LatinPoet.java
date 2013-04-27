@@ -22,7 +22,7 @@ public class LatinPoet {
 	private static Calendar rightNow;
 	public static void main(String[] args) {
 		sv = new ServumVerbi("DICTLINERAND.GEN",
-				"inflectsMacs.LAT", "LatinMacronFile.xml");
+				"InflectsMacs.LAT", "LatinMacronFile.xml");
 
 		System.out.println();
 		System.out.println();
