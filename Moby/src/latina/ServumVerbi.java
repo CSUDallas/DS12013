@@ -3,29 +3,38 @@ package latina;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServumVerbi {
 	DSLinkedList<Verbum> words; 
-	//DSBinaryTree<Verbum> wordTree; 
+	DSBinaryTree<Verbum> wordTree; 
+	DSLinkedList<Verbum> wordsToUse = new DSLinkedList<Verbum>();
 	DSLinkedList<Terminus> inflects; 
+	DSLinkedList<String> keys = new DSLinkedList<String>();
 	int ft = 0, nft = 0;
+	private static Calendar rightNow;
 
 	public ServumVerbi(String dict, String flec, String macron) {
-
+		rightNow = Calendar.getInstance();
+		int startMin = rightNow.get(rightNow.MINUTE);
+		int startSec = rightNow.get(rightNow.SECOND);
+		//writeDactylLine();
+		
 		// First we read the DICTLINE.GEN file, preferably randomized first
 		try { 
 			FileReader f = new FileReader(dict);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
 			words = new DSLinkedList<Verbum>();
-			//wordTree = new DSBinaryTree<Verbum>();
+			wordTree = new DSBinaryTree<Verbum>();
 			while ((line = reader.readLine()) != null) {
 				Verbum v = new Verbum();
 				v.setLine(line);
 				words.addFirst(v);
-				//wordTree.insert(v);
+				wordTree.insert(v);
 			}
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
@@ -58,7 +67,7 @@ public class ServumVerbi {
 
 		// Set the nominative form
 		testGetNom();
-		
+		keys.addLast("");
 		// Now we read the macron file
 		int numFound = 0, numNotFound = 0;
 		try { 
@@ -74,15 +83,27 @@ public class ServumVerbi {
 				line = line.replace("-", "");
 				workingLine = workingLine + line.trim();
 				Matcher m = bp.matcher(workingLine);
+				//System.out.println(m);
 				if(m.find()){
 					keyMatch  = m.group(1);
 					orthMatch = m.group(2);
-					boolean foundNomForm = processMacrons(keyMatch, orthMatch);
-					if(foundNomForm)
-						numFound++;	
-					else
-						numNotFound++;
-		        	workingLine = "";
+					//if(keys.contains(keyMatch)){
+					//	System.out.println("match");
+					//	System.out.println(keyMatch);
+					//	System.out.println("------");
+					//	}
+					//else{
+						//keys.addLast(keyMatch);
+						//System.out.println(keyMatch);
+						//System.out.println(orthMatch);
+						//System.out.println("------");
+						boolean foundNomForm = processMacrons(keyMatch, orthMatch);
+						if(foundNomForm)
+							numFound++;	
+						else
+							numNotFound++;
+			        	workingLine = "";
+					//}
 				}
 			}
 		} catch (IOException x) {
@@ -90,6 +111,17 @@ public class ServumVerbi {
 		}
 		System.out.println("Done reading " + macron + " file");
 		System.out.println("Found " + numFound + ", failed to find: " + numNotFound);
+		testDelNomFromMac();
+		//DSElement<String> e = keys.first;
+		//for(int i =0; i<200; i++){
+		//	System.out.println(e.getItem());
+		//	e = e.getNext();
+		//}
+		rightNow = Calendar.getInstance();
+		int endMin = rightNow.get(rightNow.MINUTE);
+		int endSec = rightNow.get(rightNow.SECOND);
+		int time = (endMin-startMin)*60 + endSec-startSec;
+		System.out.println("Time elapsed (sec): " + time);
 	}
 	
 	
@@ -111,9 +143,12 @@ public class ServumVerbi {
 				macronForm = macronForm + key.charAt(i);
 		}
 		//System.out.println(key + ", " + orth + ", " + macronForm);
-		Verbum v = findWordByNomForm(key);
+		Verbum v = findWordByNomForm(key, wordTree.root); //Found 8367, failed to find: 9214 - Sec. 8
+		//Verbum v = findWordByNomForm(key); //Found 13620, failed to find: 3961 - SEc. 20
 		if(v != null){
 			v.macrons = macronForm;
+			//if(wordsToUse.)
+			wordsToUse.addLast(v);
 			return true;
 		}
 		else{
@@ -121,12 +156,21 @@ public class ServumVerbi {
 			return false;
 		}
 	}
-	
+	public void testThings(){
+		DSElement<Verbum> e = wordsToUse.first;
+		for(int i = 0; i<1000; i++){
+			Verbum v = e.getItem();
+			System.out.println(v.nom + " " + v.macrons + " " + v.form1);
+ 			e = e.getNext();
+		}
+		
+	}
 	/*
 	 * Searches the words list for a Verbum whose nom field equals nomForm
+	 * Uses the linked list for searching
 	 * XXX This would go quicker if we were in a binary tree...
 	 */
-	private Verbum findWordByNomForm(String nomForm){
+	public Verbum findWordByNomForm(String nomForm){
 		DSElement<Verbum> e = words.first;
 		while(e != null){
 			if(e.getItem().nom.equals(nomForm))
@@ -134,6 +178,23 @@ public class ServumVerbi {
 			else
 				e = e.getNext();
 		}
+		return null;
+	}
+	/*
+	 * Searches the words list for a Verbum whose nom field equals nomForm
+	 * Uses the binary tree for searching
+	 */
+	private Verbum findWordByNomForm(String nomForm, DSElement<Verbum> start){
+		if(start == null)
+			return null;		
+		int cmp = start.getItem().nom.compareToIgnoreCase(nomForm);
+		if(cmp == 0){
+			return start.getItem();
+		}
+		if(cmp < 0)
+			return findWordByNomForm(nomForm, start.getRight());
+		if(cmp > 0)
+			return findWordByNomForm(nomForm, start.getLeft());
 		return null;
 	}
 
@@ -150,8 +211,8 @@ public class ServumVerbi {
 
 	public Verbum getWord(String pos, char freqLevel){
 		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * words.size());
-		DSElement<Verbum> w = words.first;
+		int start = (int)(Math.random() * wordsToUse.size());
+		DSElement<Verbum> w = wordsToUse.first;
 		for(int i = 0; i < start; i++)
 			w = w.getNext();
 		char freq;    
@@ -164,7 +225,7 @@ public class ServumVerbi {
 		 * E   2-3 citations - uncommon
 		 * F   only 1 citation - very rare
 		 */
-		int count = words.size()*100;    // failsafe counter
+		int count = wordsToUse.size()*100;    // failsafe counter
 		while(count > 0){
 			if(w.getItem().attribs.length()>3)
 				freq = w.getItem().attribs.charAt(3);
@@ -176,7 +237,7 @@ public class ServumVerbi {
 				return w.getItem();
 			w = w.getNext();
 			if(w == null)
-				w = words.first;
+				w = wordsToUse.first;
 			count--;
 		}
 		w.getItem().form1 = w.getItem().form1 + " BAD";
@@ -222,14 +283,15 @@ public class ServumVerbi {
 		DSElement<Verbum> w = words.first;
 		int count = words.size();    // failsafe counter
 		while(count > 0){
-			w.setItem(vGetNom(w.getItem()));
+			GetNom(w.getItem());
+			//System.out.println(w.getItem().nom);
 			w = w.getNext();
 			if(w == null)
 				w = words.first;
 			count--;
 		}
 		
-		DSElement<Verbum> x = words.first;
+		/*DSElement<Verbum> x = words.first;
 		for(int i = 0; i<words.size(); i++){
 			Verbum v = x.getItem();
 			//if(v.pos.equals("ADV")){
@@ -237,10 +299,10 @@ public class ServumVerbi {
 			
 			//}
 			x = x.getNext();
-		}
+		}*/
 	}
 
-	public Verbum vGetNom(Verbum w){
+	public void GetNom(Verbum w){
 		DSElement<Terminus> ending = inflects.first;
 		int variant = w.variant;
 		int variant2 = -2;
@@ -266,7 +328,7 @@ public class ServumVerbi {
 				} else {
 					w.nom = w.form1 + "o";
 				}
-				return w;
+				return;
 			} else if(w.pos.equals("N") && end.pos.equals("N")) { //NOUN
 				/* Some special cases */
 				if(cd == 3 && variant == 1){ //Common lots of cases
@@ -279,7 +341,7 @@ public class ServumVerbi {
 				}
 				if(cd == 3) {
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				/* END */
 				if (end.wordcase != null && end.number != null){
@@ -288,73 +350,73 @@ public class ServumVerbi {
 							end.gender.equals(gender)) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						return;
 					}
 					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
 							end.wordcase.equals("NOM") && end.number.equals("S") &&
 							end.gender.equals("X")) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						return;
 					}
 					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
 							end.wordcase.equals("NOM") && end.number.equals("S") && 
 							end.gender.equals("C")) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						return;
 					}
 				}
 			} else if(w.pos.equals("ADJ") && end.pos.equals("ADJ")) {
 				/* Some special cases */
 				if(cd == 1 && (variant == 1 || variant == 3 || variant == 5)) {
 					w.nom = w.form1 + "us";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 1 && (variant == 2 || variant == 4)){ //Common lots of cases
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("COMP")) {
 					w.nom = w.form1 + "or";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("SUPER")) {
 					w.nom = w.form1 + "mus";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 1) {
 					w.nom = w.form1 + "e";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 2) {
 					w.nom = w.form1 + "a";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 3) {
 					w.nom = w.form1 + "es";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && (variant == 6 || variant == 7)) {
 					w.nom = w.form1 + "os";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 8) {
 					w.nom = w.form1 + "on";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 3 && (variant == 1 || variant == 3 || variant == 6)) {
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 3 && variant == 2) {
 					w.nom = w.form1 + "is";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				/* END */				
 			} else if(w.pos.equals("ADV") && end.pos.equals("ADV")) {
 				w.nom = w.form1;
-				return w; //return nom. s. 3rd decl.
+				return; //return nom. s. 3rd decl.
 			}
 			ending = ending.getNext();
 			if(ending == null)
@@ -362,7 +424,220 @@ public class ServumVerbi {
 			count--;
 		}
 		w.nom = w.form1;
-		return w;
+		return;
+	}
+	public void testDelNomFromMac(){
+		DSElement<Verbum> w = wordsToUse.first;
+		int count = wordsToUse.size();    // failsafe counter
+		while(count > 0){
+			if(w.getItem().macForm.isEmpty()){
+			delNomFromMac(w.getItem());
+			macsToForms(w.getItem());
+			//System.out.println(w.getItem().macForm);
+			}
+			w = w.getNext();
+			if(w == null)
+				w = wordsToUse.first;
+			count--;
+		}
+		
+	}
+
+	public void macsToForms(Verbum w){
+		char[] letters = w.macForm.toCharArray();
+		ArrayList<Integer> indecies = new ArrayList<Integer>();
+		//int[] indecies = new int[]; 
+		int c = 0;
+		for(int i = 0; i<letters.length; i++){ //Make into ints
+			if(letters[i]=='*'){
+				indecies.add(i);
+				c++;
+			}
+		}
+		c = 0;
+		for(int s : indecies){
+			//if((c==0 && s==0) || (c!=0 && s!=0)){
+				w.form1 = new StringBuffer(w.form1).insert(s, "*").toString();
+				if(w.form2.length()>=findLargest(indecies)){
+					w.form2 = new StringBuffer(w.form2).insert(s, "*").toString();
+				}
+				if(w.form3.length()>=findLargest(indecies)){
+				w.form3 = new StringBuffer(w.form3).insert(s, "*").toString();
+				}
+				if(w.form4.length()>=findLargest(indecies)){
+				w.form4 = new StringBuffer(w.form4).insert(s, "*").toString();
+				}
+			//}
+			c++;
+		}	
+	}
+	public static int findLargest(ArrayList<Integer> numbers){  
+	    int largest = numbers.get(0);  
+	    for(int s : numbers){  
+	        if(s > largest){  
+	            largest = s;  
+	        }  
+	    }  
+	    return largest;
+	}
+	public void delNomFromMac(Verbum w){
+		DSElement<Terminus> ending = inflects.first;
+		int variant = w.variant;
+		int variant2 = -2;
+		int cd = w.cd;
+		String gender = w.gender;
+
+		int start = (int)(Math.random() * inflects.size());
+		for(int i = 0; i < start; i++)
+			ending = ending.getNext();
+		String form ="";
+		int count = inflects.size();    // failsafe counter
+		while(count > 0){
+			Terminus end = ending.getItem();
+			String mf = w.macForm;
+			if(w.pos.equals("V")) { //VERB
+				if(w.type.equals("DEP")){
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = mf.substring(0, mf.length()-2);
+					}
+					
+				} else {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-2);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+				}
+				return;
+			} else if(w.pos.equals("N") && end.pos.equals("N")) { //NOUN
+				/* Some special cases */
+				if(cd == 3 && variant == 1){ //Common lots of cases
+					variant = 0;
+					variant2 = 1;
+				}
+				if(cd == 2 && variant == 1){ //Common lots of cases
+					variant = 0;
+					variant2 = 1;
+				}
+				if(cd == 3) {
+					w.macForm=w.macrons;
+					return; //return nom. s. 3rd decl.
+				}
+				/* END */
+				if (end.wordcase != null && end.number != null){
+					if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
+							end.wordcase.equals("NOM") && end.number.equals("S") && 
+							end.gender.equals(gender)) {
+						w.macForm = w.macrons.substring(0, w.macrons.length()-1-end.ending.length());
+						if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+							w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+						}
+						return;
+					}
+					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
+							end.wordcase.equals("NOM") && end.number.equals("S") &&
+							end.gender.equals("X")) {
+						w.macForm = w.macrons.substring(0, w.macrons.length()-1-end.ending.length());
+						if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+							w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+						}
+						return;
+					}
+					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
+							end.wordcase.equals("NOM") && end.number.equals("S") && 
+							end.gender.equals("C")) {
+						w.macForm = w.macrons.substring(0, w.macrons.length()-1-end.ending.length());
+						if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+							w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+						}
+						return;
+					}
+				}
+			} else if(w.pos.equals("ADJ") && end.pos.equals("ADJ")) {
+				/* Some special cases */
+				if(cd == 1 && (variant == 1 || variant == 3 || variant == 5)) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 1 && (variant == 2 || variant == 4)){ //Common lots of cases
+					w.macForm=w.macrons;
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 0 && variant == 0 && w.type.equals("COMP")) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 0 && variant == 0 && w.type.equals("SUPER")) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-4);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 2 && variant == 1) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-2);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 2 && variant == 2) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-2);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 2 && variant == 3) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 2 && (variant == 6 || variant == 7)) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 2 && variant == 8) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 3 && (variant == 1 || variant == 3 || variant == 6)) {
+					w.macForm=w.macrons;
+					return; //return nom. s. 3rd decl.
+				}
+				if(cd == 3 && variant == 2) {
+					w.macForm = w.macrons.substring(0, w.macrons.length()-3);
+					if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+						w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+					}
+					return; //return nom. s. 3rd decl.
+				}
+				/* END */				
+			} else if(w.pos.equals("ADV") && end.pos.equals("ADV")) {
+				w.macForm=w.macrons;
+				return; //return nom. s. 3rd decl.
+			}
+			ending = ending.getNext();
+			if(ending == null)
+				ending = inflects.first;
+			count--;
+		}
+		w.macForm=w.macrons;
+		return;
 	}
 
 	public Verbum vGetTerminus(Verbum w, int p, String num, String tense, String voice, String mood){

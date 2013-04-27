@@ -19,6 +19,7 @@ public class Verbum implements Comparable<Verbum> {
 	
 	public String nom;
 	public String macrons;
+	public String macForm;
 	
 	/*
 	 * Constructor
@@ -39,6 +40,7 @@ public class Verbum implements Comparable<Verbum> {
 		cw = new Unilogos();
 		nom = "";
 		macrons = "";
+		macForm = "";
 	}
 	
 	/*

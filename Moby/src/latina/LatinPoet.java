@@ -21,7 +21,7 @@ public class LatinPoet {
 	private static int counter;
 	private static Calendar rightNow;
 	public static void main(String[] args) {
-		sv = new ServumVerbi("DICTLINE.GEN",
+		sv = new ServumVerbi("DICTLINERAND.GEN",
 				"INFLECTS.LAT", "LatinMacronFile.xml");
 
 		System.out.println();
@@ -30,7 +30,7 @@ public class LatinPoet {
 		rightNow = Calendar.getInstance();
 		int startMin = rightNow.get(rightNow.MINUTE);
 		int startSec = rightNow.get(rightNow.SECOND);
-		//writeDactylLine();
+	writeDactylLine();
 		rightNow = Calendar.getInstance();
 		int endMin = rightNow.get(rightNow.MINUTE);
 		int endSec = rightNow.get(rightNow.SECOND);
@@ -40,10 +40,22 @@ public class LatinPoet {
 		//writeClerihew(false);
 		//writeLine(false);
 		//conjugate("ACTIVE", "IND");
-		// decline();
+		 //decline();
 		// XXX I moved "testGetNom()" into the constructor of the sv, since we
 		// XXX need it before we read the macron file, also in the constructor.
 		//sv.testGetNom();
+		String st = "abcd";
+		st = new StringBuffer(st).insert(2, "C").toString();
+		System.out.println(st);
+		System.out.println(getMeter("arma virumque cano troiae qui pr*imus ab *or*is"));
+		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
+		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
+		System.out.println(getMeter("arma virumque cano tr*iae qui pr*imus ab *or*is"));
+		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
+		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
+		System.out.println(sv.findWordByNomForm("ne").nom + " " + sv.findWordByNomForm("ne").macrons + " " + sv.findWordByNomForm("ne").form1);
+		
+		//sv.testThings();
 	}
 
 	
@@ -78,6 +90,26 @@ public class LatinPoet {
 		//Dactylic Hexameter
 		if(s.equals(" 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 1"))
 			return true;
+		else if(s.equals(" 1 1 1 0 0 1 0 0 1 0 0 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 1 1 0 0 1 0 0 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 1 1 1 1 0 0 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 0 0 1 1 1 1 1 1 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 0 0 1 1 1 1 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 1 1 0 0 1 1 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 0 0 1 0 0 1 0 0 1 1 1 1"))
+			return true;
+		else if(s.equals(" 1 1 1 0 0 1 0 0 1 1 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 0 0 1 1 1 0 0 1 1 1 0 0 1 1"))
+			return true;
+		else if(s.equals(" 1 0 0 1 1 1 0 0 1 0 0 1 0 0 1 1"))
+			return true;
 		return false;
 	}
 	
@@ -100,7 +132,7 @@ public class LatinPoet {
 		K = K + v2.cw.item;
 		if(!meterMatch(getMeter(K))){ //dactylMeter(K)
 			if(counter>40000){
-				System.out.println("+40000");
+				//System.out.println("+40000");
 			}
 			writeDactylLine();
 		} else {
@@ -227,6 +259,10 @@ public class LatinPoet {
 						//dactyl
 						f= true;
 						i=i+3;
+					} else if(syll[i] == 1 && syll[i+1] == 1){
+						//dactyl
+						f= true;
+						i=i+2;
 					} else {
 						//Foot is bad here.
 						return false;
@@ -255,11 +291,14 @@ public class LatinPoet {
 		s = s.replace(" h", "");
 		s = elisions(s);
 		s = s.replace(" ", "");
-
+		//System.out.println(s);
 		int i = 0;
 		do {
 			char c = s.charAt(i);
-			if(isVowel(c)){
+			if(c=='*'){
+				m = m + " 1"; //long by nature
+				i++;
+			} else if(isVowel(c)){
 				if(isVowel(s.charAt(i+1))){
 					if(isDipthong(Character.toString(c) + Character.toString(s.charAt(i+1)))){
 						m = m + " 1"; //dipthong, long
@@ -270,29 +309,42 @@ public class LatinPoet {
 					}			
 				} else {
 					if(s.length()>3){
-						if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
-							m = m + " 1"; //vowel + double consonant, long
-							i=i+3;
-						} else if(s.charAt(i+2)=='q' && s.charAt(i+3)=='u'){
-							m = m + " 1"; //vowel + consonant + double consonant, long
-							i=i+4;
-						} else if(isVowel(s.charAt(i+2))){
+						//if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
+						//	m = m + " 1"; //vowel + double consonant, long
+						///	i=i+3;
+						//} //else if(s.charAt(i+2)=='q' && s.charAt(i+3)=='u'){
+						//	m = m + " 1"; //vowel + consonant + double consonant, long
+						//	i=i+4;
+						//}
+						if(isVowel(s.charAt(i+2))){
 							m = m + " 0"; //vowel + single consonant, short
 							i=i+2;
 						} else {
 							m = m + " 1"; //vowel + double consonant, long
 							i=i+3;
 						}
-					} //else {
-					//	return m;
-					//}
+					} else {
+						if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
+							m = m + " 1"; //vowel + double consonant, long
+							i=i+3;
+						} else if(isVowel(s.charAt(i+1))){
+							m = m + " 0"; //vowel + single consonant, short
+							i=i+1;
+						} else {
+							m = m + " 1"; //vowel + double consonant, long
+							i=i+3;
+						}
+					}
 				}		
 			} else {
 				i++; // A third consonant, do nothing
 			}
 			if(i>s.length()-3 && i<s.length()){ //If on the penultimate or ultimate letter
 				c = s.charAt(i);
-				if(isVowel(c)){
+				if(c=='*'){
+					m = m + " 1"; //long by nature
+					i++;
+				} else if(isVowel(c)){
 					if(i!=s.length()-1){ //Not the ultimate letter
 						if(isVowel(s.charAt(i+1))){
 							if(isDipthong(Character.toString(c) + Character.toString(s.charAt(i+1)))){
@@ -318,7 +370,7 @@ public class LatinPoet {
 		return m;
 	}
 	public static boolean isVowel(char ch) {
-		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y';
+		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y' || ch == '*';
 	}
 	public static boolean isDipthong(String s) {
 		return s.equals("ae") || s.equals("au") || s.equals("ei") || s.equals("eu") || s.equals("oe") || s.equals("ui") || s.equals("ii");
@@ -333,6 +385,11 @@ public class LatinPoet {
 		}
 		for(String x : vowels){
 			if(!x.equals("i")){
+				s = s.replace("*a " + x, x);
+				s = s.replace("*e " + x, x);
+				s = s.replace("*i " + x, x);
+				s = s.replace("*o " + x, x);
+				s = s.replace("*u " + x, x);
 				s = s.replace("a " + x, x);
 				s = s.replace("e " + x, x);
 				s = s.replace("i " + x, x);
@@ -340,12 +397,17 @@ public class LatinPoet {
 				s = s.replace("u " + x, x);
 			}
 		}
+		for(String x : vowels){
+				s = s.replace("*" + x, "*");
+		}
+		s = s.replace("qu", "qq");
 		return s;
 	}
 
 	public static void conjugate(String voice, String mood){
-		Verbum w = sv.getWord("V", 'B');
+		Verbum w = sv.getWord("V", 'Z');//sv.findWordByNomForm("venio");
 		System.out.println();	
+		System.out.println(w.macrons);		
 		System.out.println(w.cd + " " + w.variant);		
 		System.out.println(sv.vGetTerminus(w, 1, "S", "PRES", voice, mood).cw.item);
 		System.out.println(sv.vGetTerminus(w, 2, "S", "PRES", voice, mood).cw.item);
@@ -393,6 +455,7 @@ public class LatinPoet {
 	}
 	public static void decline(){
 		Verbum n = sv.getWord("N", 'B');
+		System.out.println(n.macrons);
 		System.out.println(n.cd + " " + n.variant + " " + n.gender + " " + n.attribs.charAt(3));
 		System.out.println(sv.nGetTerminus(n, "NOM", "S").cw.item);
 		System.out.println(sv.nGetTerminus(n, "GEN", "S").cw.item);
