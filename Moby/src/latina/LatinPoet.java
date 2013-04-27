@@ -30,16 +30,16 @@ public class LatinPoet {
 		rightNow = Calendar.getInstance();
 		int startMin = rightNow.get(rightNow.MINUTE);
 		int startSec = rightNow.get(rightNow.SECOND);
-	writeDactylLine();
+	//writeDactylLine();
 		rightNow = Calendar.getInstance();
 		int endMin = rightNow.get(rightNow.MINUTE);
 		int endSec = rightNow.get(rightNow.SECOND);
 		int time = (endMin-startMin)*60 + endSec-startSec;
 		System.out.println("Time elapsed (sec): " + time);
 		//System.out.println("\"Clerihew\":");
-		//writeClerihew(false);
+		writeClerihew(false);
 		//writeLine(false);
-		//conjugate("ACTIVE", "IND");
+		conjugate("ACTIVE", "IND");
 		 //decline();
 		// XXX I moved "testGetNom()" into the constructor of the sv, since we
 		// XXX need it before we read the macron file, also in the constructor.
