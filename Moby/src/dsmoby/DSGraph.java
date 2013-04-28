@@ -3,6 +3,7 @@ package dsmoby;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class DSGraph {
 	DSLinkedList<DSVertex> vertexList;
@@ -81,8 +82,33 @@ public class DSGraph {
 	public boolean shortestPath(){
 		return false;
 	}
-	
-	public boolean isConnected(){
+	/*add the first point to the list
+	 * then add its neighbors that are not in the list into the list
+	 * after the list is full, compare # of items. If # of items is equal,
+	 *  then list is connected. 
+	 */
+	public DSLinkedList<DSVertex> ISConnected;
+	public DSLinkedList<DSVertex> J;
+	public boolean isConnected(String label){
+		ISConnected = new DSLinkedList<DSVertex>();
+		DSElement<DSVertex> t = vertexList.first;
+		t.addFirst();
+		DSElement<DSVertex> f = ISConnected.first;
+		mark first item in queue as in queue
+		J = new DSLinkedList<DSVertex>();
+		J.first = vertexList.first.neighbors;
+		
+		while(f !=null){
+			// add items that f is pointing too
+			if neighbors is not in the queue
+			add it to the queue
+			mark these items as in
+			pop first off queue
+			
+			after loops check iff all items are marked
+			if all marked connected
+			if not all marked not connected
+		}
 		return false;
 	}
 	
