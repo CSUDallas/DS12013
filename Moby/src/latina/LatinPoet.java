@@ -22,7 +22,7 @@ public class LatinPoet {
 	private static Calendar rightNow;
 	public static void main(String[] args) {
 		sv = new ServumVerbi("DICTLINERAND.GEN",
-				"InflectsMacs.LAT", "LatinMacronFile.xml");
+				"InflectsMacs.txt", "LatinMacronFile.xml");
 
 		System.out.println();
 		System.out.println();
@@ -37,28 +37,67 @@ public class LatinPoet {
 		int time = (endMin-startMin)*60 + endSec-startSec;
 		System.out.println("Time elapsed (sec): " + time);
 		//System.out.println("\"Clerihew\":");
-		writeClerihew(false);
+		//writeClerihew(false);
+		writeLine(false);
+		//System.out.println("-------------");
 		//writeLine(false);
-		conjugate("ACTIVE", "IND");
+		///System.out.println("-------------");
+		//writeLine(false);
+		////System.out.println("-------------");
+		//writeLine(false);
+		//System.out.println("-------------");
+		//writeLine(false);
+		//conjugate("ACTIVE", "IND");
 		 //decline();
 		// XXX I moved "testGetNom()" into the constructor of the sv, since we
 		// XXX need it before we read the macron file, also in the constructor.
 		//sv.testGetNom();
-		String st = "abcd";
-		st = new StringBuffer(st).insert(2, "C").toString();
-		System.out.println(st);
-		System.out.println(getMeter("arma virumque cano troiae qui pr*imus ab *or*is"));
+		//String st = "abcd";
+		//st = new StringBuffer(st).insert(2, "C").toString();
+		//System.out.println(st);
+		//System.out.println(getMeter("arma virumque cano troiae qui pr*imus ab *or*is"));
 		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
 		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
-		System.out.println(getMeter("arma virumque cano tr*iae qui pr*imus ab *or*is"));
+		//System.out.println(getMeter("arma virumque cano tr*iae qui pr*imus ab *or*is"));
 		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
 		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
-		System.out.println(sv.findWordByNomForm("ne").nom + " " + sv.findWordByNomForm("ne").macrons + " " + sv.findWordByNomForm("ne").form1);
+		System.out.println(sv.findWordByNomForm("venio").form1 + " " + sv.findWordByNomForm("venio").form2 + " " + sv.findWordByNomForm("venio").form3 + " " + sv.findWordByNomForm("venio").form4);
+		System.out.println(sv.findWordByNomForm("amo").form1 + " " + sv.findWordByNomForm("amo").form2 + " " + sv.findWordByNomForm("amo").form3 + " " + sv.findWordByNomForm("amo").form4);
+		System.out.println(sv.findWordByNomForm("laudo").form1 + " " + sv.findWordByNomForm("laudo").form2 + " " + sv.findWordByNomForm("laudo").form3 + " " + sv.findWordByNomForm("laudo").form4);
 		
 		//sv.testThings();
 	}
 
-	
+	public static Verbum randDactylWord(Verbum v, String pos, String c, String num, int p, String tense, String voice, String mood, String s){
+		//Find the word that fits next with the current meter for dactyls
+		Verbum w = new Verbum();
+		int i = 1;
+		while(i<100){
+			counter++;
+			int rand = (int)(Math.random()*10);
+			
+			if(rand<4){
+				if(rand<2){
+					w = sv.nGetTerminus(sv.getWord("N", 'B'), c, "P");
+				} else {
+					w = sv.nGetTerminus(sv.getWord("N", 'B'), c, "S");
+				}
+			} else if(4<rand && rand<7){
+				w = sv.adjGetTerminus(sv.getWord("ADJ", 'B'), v, c, num);
+			} else {
+				w = sv.vGetTerminus(sv.getWord("V", 'B'), p, v.cw.number, tense, voice, mood);
+			}
+			if(w.cw.item!=""){//!w.cw.item.contains("MALUM")){
+				if(getMeter(w.cw.item).length()<7){					
+					if(dactylMeter(s + w.cw.item)){
+						return w;
+					}
+				}
+			}
+			i++;
+		}
+		return w;
+	}
 	
 	public static Verbum dactylWord(Verbum v, String pos, String c, String num, int p, String tense, String voice, String mood, String s){
 		//Find the word that fits next with the current meter for dactyls
@@ -116,19 +155,19 @@ public class LatinPoet {
 	public static void writeDactylLine(){
 		Verbum dummy = new Verbum();
 		String K = "";
-		Verbum sub2 = dactylWord(dummy, "N", "NOM", "P", 0, "", "", "", K);
+		Verbum sub2 = randDactylWord(dummy, "N", "NOM", "P", 0, "", "", "", K);
 		K = K + sub2.cw.item + " ";
-		Verbum ob2 = dactylWord(dummy, "N", "ACC", "S", 0, "", "", "", K);
+		Verbum ob2 = randDactylWord(dummy, "N", "ACC", "S", 0, "", "", "", K);
 		K = K + ob2.cw.item + " ";
-		Verbum adj = dactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
+		Verbum adj = randDactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
 		K = K + adj.cw.item + " ";
-		Verbum adj4 = dactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
+		Verbum adj4 = randDactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
 		K = K + adj4.cw.item + " ";
-		Verbum ob3 = dactylWord(dummy, "A", "ABL", "S", 0, "", "", "", K);
+		Verbum ob3 = randDactylWord(dummy, "A", "ABL", "S", 0, "", "", "", K);
 		K = K + ob3.cw.item + " ";
-		Verbum adj3 = dactylWord(ob3, "A", "ABL", "S", 0, "", "", "", K);
+		Verbum adj3 = randDactylWord(ob3, "A", "ABL", "S", 0, "", "", "", K);
 		K = K + adj3.cw.item + " ";
-		Verbum v2= dactylWord(dummy, "V", "", "P", 3, "PRES", "ACTIVE", "IND", K);
+		Verbum v2= randDactylWord(sub2, "V", "", "P", 3, "PERF", "ACTIVE", "IND", K);
 		K = K + v2.cw.item;
 		if(!meterMatch(getMeter(K))){ //dactylMeter(K)
 			if(counter>40000){
@@ -136,8 +175,9 @@ public class LatinPoet {
 			}
 			writeDactylLine();
 		} else {
-			String K2 = K + "\n" + getMeter(K) + "\n" + counter + "\n";
+			String K2 = K.replace("*", "") + "\n" + K + "\n" + getMeter(K) + "\n" + counter + "\n";
 			System.out.println(K2);
+			System.out.println(sub2.cw.number);
 			counter=0;
 		}
 	}
@@ -182,16 +222,16 @@ public class LatinPoet {
 		}
 
 		output = S + "\n";
-		output = output + getMeter(subject.cw.item) + "\n";
+		//output = output + getMeter(subject.cw.item) + "\n";
 		output = output + getMeter(S) + "\n";
 		//output = output + analyzeMeter(S);
-		//String S = subject.cw.item;
+		//S = subject.cw.item;
 		//S = S + " " + sv.nGetTerminus(adj, "ACC", "S");
 		//S = S + " " + adj.cw.item;
 		//S = S + " " + object.cw.item;
 		//S = S + " " + verb.cw.item;
 		//S = S + " " + adv.form1;
-		//System.out.println(output);
+		System.out.println(output);
 		System.out.println();
 		if(extra){
 			System.out.println("Meter: " + getMeter(S));

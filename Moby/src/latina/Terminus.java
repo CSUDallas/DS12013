@@ -1,14 +1,18 @@
 package latina;
-
+/*
+ * Terminus holds an ending from the inflects file
+ * It contains lots of information about it, such as the form to use, gender,
+ * declension, conjugation, tense, voice, etc.
+ */
 public class Terminus implements Comparable<Terminus> {
-	public String pos;
-	public int cd;
-	public int variant;
+	public String pos;			// part of speech
+	public int cd;				// conjugation or declension
+	public int variant;			// variant inside conjugation or declension
 	public String wordcase;		// for nouns and adjectives ("case" is a reserved word in Java)
-	public String number;
-	public String gender;
+	public String number;		// number of ending
+	public String gender;		
 	public String degree;
-	public int form;
+	public int form;			// Verbum form number the ending takes
 	public String ending;
 	public String age;
 	public String freq;
@@ -20,9 +24,31 @@ public class Terminus implements Comparable<Terminus> {
 	public int hash;			// for inserting into binary trees
 
 	public Terminus(){
-		// You ought to initialize ints and Strings here.
+		// Initialize ints and Strings here.
+		pos = "";
+		cd = -2;			//-1 is used
+		variant = -2;		//-1 is used
+		wordcase = "";
+		number = "";
+		gender = "";		
+		degree = "";
+		form = -1;	
+		ending = "";
+		age = "";
+		freq = "";
+		tense = "";
+		voice = "";
+		mood = "";
+		person = "";
+		type = "";		// for numbers
 		hash = (int)(Math.random() * 10000);
 	}
+	/*
+	 * After this object has been created, this method
+	 * can be used to set field values from a line of 
+	 * text from the file INFLECTS.LAT / InflectsMacs.txt
+	 * Returns 0 on success, -1 on some error
+	 */
 	public int setLine(String l){
 		int offset;		// -1 if there is no ending, 0 if there is
 		String[] a = l.split(" +");
@@ -132,16 +158,14 @@ public class Terminus implements Comparable<Terminus> {
 		} else {
 			return -1;
 		}
-
 		//print();
 		return 0;
 	}
-
 	// So that we can be Comparable
 	public int compareTo(Terminus w){
 		return hash - w.hash;
 	}
-
+	// Print all info on particular ending
 	public void print(){
 		System.out.println("POS:" + pos + ", cd = " + cd + ", variant = " + variant);
 		System.out.println("wordcase = " + wordcase + ", number = " + number + ", gender = " + gender);
