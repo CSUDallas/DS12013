@@ -88,32 +88,39 @@ public class DSGraph {
 	 *  then list is connected. 
 	 */
 	public DSLinkedList<DSVertex> connectedVertices;
-	public DSLinkedList<DSVertex> J;
 	public boolean isConnected(){
+		DSElement<DSVertex> k = vertexList.first; 
+		while (k != null){
+			k.getItem().visited = false;
+			k = k.getNext();
+		}
 		connectedVertices = new DSLinkedList<DSVertex>();
 		DSElement<DSVertex> t = vertexList.first;
 		connectedVertices.addFirst(t.getItem());
 		t.getItem().visited = true;
-		DSElement<DSVertex> j = t.getItem().neighbors.first;
+		
 		while (connectedVertices.first != null){
+			System.out.println(connectedVertices.first.getItem().label);
+			DSElement<DSVertex> j = connectedVertices.first.getItem().neighbors.first;
 			while (j != null){
-			connectedVertices.addLast(j.getItem());
-			if (connectedVertices.last.getItem().visited = true){
-			connectedVertices.removeLast();
+				connectedVertices.addLast(j.getItem());
+				if (connectedVertices.last.getItem().visited == true){
+					connectedVertices.removeLast();
+				}
+				connectedVertices.last.getItem().visited = true;
+				System.out.println("innerloop" + j.getItem().label);
+				j = (j.getNext());
 			}
-			connectedVertices.last.getItem().visited = true;
-			j = (j.getNext());
+			connectedVertices.removeFirst();
+			System.out.println("ilooped" + connectedVertices.count);
+		}
+		DSElement<DSVertex> r = vertexList.first; 
+		while (r != null){
+			if (r.getItem().visited == true){
+				r = r.getNext();
 			}
-		connectedVertices.removeFirst();
-		j = connectedVertices.first;
+			else return false;
 		}
-	DSElement<DSVertex> r = vertexList.first; 
-	while (r != null){
-		if (r.getItem().visited = true){
-		r = r.getNext();
-		}
-		else return false;
-	}
 		return true;
 	}
 	
