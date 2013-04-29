@@ -87,29 +87,34 @@ public class DSGraph {
 	 * after the list is full, compare # of items. If # of items is equal,
 	 *  then list is connected. 
 	 */
-	public DSLinkedList<DSVertex> ISConnected;
+	public DSLinkedList<DSVertex> connectedVertices;
 	public DSLinkedList<DSVertex> J;
-	public boolean isConnected(String label){
-		ISConnected = new DSLinkedList<DSVertex>();
+	public boolean isConnected(){
+		connectedVertices = new DSLinkedList<DSVertex>();
 		DSElement<DSVertex> t = vertexList.first;
-		t.addFirst();
-		DSElement<DSVertex> f = ISConnected.first;
-		mark first item in queue as in queue
-		J = new DSLinkedList<DSVertex>();
-		J.first = vertexList.first.neighbors;
-		
-		while(f !=null){
-			// add items that f is pointing too
-			if neighbors is not in the queue
-			add it to the queue
-			mark these items as in
-			pop first off queue
-			
-			after loops check iff all items are marked
-			if all marked connected
-			if not all marked not connected
+		connectedVertices.addFirst(t.getItem());
+		t.getItem().visited = true;
+		DSElement<DSVertex> j = t.getItem().neighbors.first;
+		while (connectedVertices.first != null){
+			while (j != null){
+			connectedVertices.addLast(j.getItem());
+			if (connectedVertices.last.getItem().visited = true){
+			connectedVertices.removeLast();
+			}
+			connectedVertices.last.getItem().visited = true;
+			j = (j.getNext());
+			}
+		connectedVertices.removeFirst();
+		j = connectedVertices.first;
 		}
-		return false;
+	DSElement<DSVertex> r = vertexList.first; 
+	while (r != null){
+		if (r.getItem().visited = true){
+		r = r.getNext();
+		}
+		else return false;
+	}
+		return true;
 	}
 	
 	public boolean isBipartite(){
