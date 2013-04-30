@@ -30,7 +30,11 @@ public class LatinPoet {
 		rightNow = Calendar.getInstance();
 		int startMin = rightNow.get(rightNow.MINUTE);
 		int startSec = rightNow.get(rightNow.SECOND);
-	//writeDactylLine();
+		writeDactylLine();
+		writeDactylLine();
+		writeDactylLine();
+		writeDactylLine();
+		//writeDactylLine();
 		rightNow = Calendar.getInstance();
 		int endMin = rightNow.get(rightNow.MINUTE);
 		int endSec = rightNow.get(rightNow.SECOND);
@@ -83,7 +87,7 @@ public class LatinPoet {
 					w = sv.nGetTerminus(sv.getWord("N", 'B'), c, "S");
 				}
 			} else if(4<rand && rand<7){
-				w = sv.adjGetTerminus(sv.getWord("ADJ", 'B'), v, c, num);
+				w = sv.adjGetTerminus(sv.getWord("ADJ", 'B'), v, v.cw.wordcase, v.cw.number);
 			} else {
 				w = sv.vGetTerminus(sv.getWord("V", 'B'), p, v.cw.number, tense, voice, mood);
 			}
@@ -159,8 +163,8 @@ public class LatinPoet {
 		K = K + sub2.cw.item + " ";
 		Verbum ob2 = randDactylWord(dummy, "N", "ACC", "S", 0, "", "", "", K);
 		K = K + ob2.cw.item + " ";
-		Verbum adj = randDactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
-		K = K + adj.cw.item + " ";
+		//Verbum adj = randDactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
+		//K = K + adj.cw.item + " ";
 		Verbum adj4 = randDactylWord(ob2, "A", "ACC", "S", 0, "", "", "", K);
 		K = K + adj4.cw.item + " ";
 		Verbum ob3 = randDactylWord(dummy, "A", "ABL", "S", 0, "", "", "", K);
