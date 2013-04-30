@@ -15,7 +15,7 @@ public class DSGraph {
 		this("");
 	}
 
-	
+
 	/*
 	 * Constructor
 	 * Reads a graph from graphFile in format:
@@ -39,7 +39,7 @@ public class DSGraph {
 				String parts[] = line.split(" ");
 				String vertex1Name = parts[0];
 				String vertex2Name = parts[1];
-				
+
 				DSVertex v1 = this.vertexWithLabel(vertex1Name);
 				if(v1 == null){
 					v1 = new DSVertex(vertex1Name);
@@ -50,7 +50,7 @@ public class DSGraph {
 					v2 = new DSVertex(vertex2Name);
 					vertexList.addLast(v2);
 				} 
-				
+
 				v1.neighbors.addLast(v2);
 				v2.neighbors.addLast(v1);
 			}
@@ -74,14 +74,46 @@ public class DSGraph {
 		}
 		return null;
 	}
-	
+
 	public boolean numberOfEdges(){
 		return false;
 	}
-	
-	public boolean shortestPath(){
-		return false;
+	/*
+	 * Finds the shortest path between the vertex with label 'start'
+	 * and the vertex with label 'end'
+	 * Prints the resulting path length
+	 */
+	public void shortestPath(String start, String end){
+		int distance = 0;
+		DSLinkedList<DSVertex> Q = new DSLinkedList<DSVertex>();
+		DSElement<DSVertex> e = new DSElement<DSVertex>();		
+		e.setItem(vertexWithLabel(start));
+		Q.count=1;
+		while(Q.count!=0){
+			distance++;
+			DSVertex v = e.getItem();
+			//System.out.println(v.label);
+			DSLinkedList<DSVertex> n = v.neighbors;
+			DSElement<DSVertex> f = n.first;
+			while(f != null){
+				if(f.getItem().distance==0){
+					f.getItem().distance = distance;
+					f.getItem().visited = true;
+					Q.addLast(f.getItem());
+				}
+				f = f.getNext();
+			}
+			if(e.getItem().label.equals(end)) {
+				System.out.println("Path length from \"" + start + "\" to \"" + e.getItem().label + "\" is " + e.getItem().distance);
+				return;
+			} else {
+				e.setItem(Q.removeFirst());
+			}
+		}
+		System.out.println("No path from \"" + start + "\" to \"" + end + "\" found.");
+		return;
 	}
+	
 	/*add the first point to the list
 	 * then add its neighbors that are not in the list into the list
 	 * after the list is full, compare # of items. If # of items is equal,
@@ -98,7 +130,7 @@ public class DSGraph {
 		DSElement<DSVertex> t = vertexList.first;
 		connectedVertices.addFirst(t.getItem());
 		t.getItem().visited = true;
-		
+
 		while (connectedVertices.first != null){
 			System.out.println(connectedVertices.first.getItem().label);
 			DSElement<DSVertex> j = connectedVertices.first.getItem().neighbors.first;
@@ -123,7 +155,7 @@ public class DSGraph {
 		}
 		return true;
 	}
-	
+
 	public boolean isBipartite(){
 		return false;
 	}
@@ -142,7 +174,7 @@ public class DSGraph {
 			e = e.getNext();
 		}
 	}
-	
+
 	/*
 	 * Prints the neighbors of input vertex v, separated by spaces, no newline.
 	 */
