@@ -75,8 +75,17 @@ public class DSGraph {
 		return null;
 	}
 
-	public boolean numberOfEdges(){
-		return false;
+	public int numberOfEdges(){
+		int sum = 0;
+		int edges = 0;
+		DSElement<DSVertex> vertex = vertexList.first;
+		while(vertex != null){
+			sum += vertex.getItem().neighbors.count;
+			vertex = vertex.getNext();
+		}
+		edges = sum/2;
+		System.out.println(edges);
+		return edges;
 	}
 
 	
