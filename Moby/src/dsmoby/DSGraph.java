@@ -15,7 +15,7 @@ public class DSGraph {
 		this("");
 	}
 
-	
+
 	/*
 	 * Constructor
 	 * Reads a graph from graphFile in format:
@@ -39,7 +39,7 @@ public class DSGraph {
 				String parts[] = line.split(" ");
 				String vertex1Name = parts[0];
 				String vertex2Name = parts[1];
-				
+
 				DSVertex v1 = this.vertexWithLabel(vertex1Name);
 				if(v1 == null){
 					v1 = new DSVertex(vertex1Name);
@@ -50,7 +50,7 @@ public class DSGraph {
 					v2 = new DSVertex(vertex2Name);
 					vertexList.addLast(v2);
 				} 
-				
+
 				v1.neighbors.addLast(v2);
 				v2.neighbors.addLast(v1);
 			}
@@ -74,11 +74,11 @@ public class DSGraph {
 		}
 		return null;
 	}
-	
+
 	public boolean numberOfEdges(){
 		return false;
 	}
-	
+
 	public boolean shortestPath(){
 		return false;
 	}
@@ -98,7 +98,7 @@ public class DSGraph {
 		DSElement<DSVertex> t = vertexList.first;
 		connectedVertices.addFirst(t.getItem());
 		t.getItem().visited = true;
-		
+
 		while (connectedVertices.first != null){
 			System.out.println(connectedVertices.first.getItem().label);
 			DSElement<DSVertex> j = connectedVertices.first.getItem().neighbors.first;
@@ -123,36 +123,82 @@ public class DSGraph {
 		}
 		return true;
 	}
-	
-	public boolean isBipartite(){
-		return false;
-	}
 
-	/*
-	 * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
-	 * one vertex per line, all neighbors of that vertex on its line.
-	 */
-	public void printGraph(){
+	public boolean isBipartite(){
 		DSElement<DSVertex> e = vertexList.first;
+		DSLinkedList<DSVertex> vertexQueue;
+		vertexQueue = new DSLinkedList<DSVertex>();
+		for(int i = 0; i < vertexList.count; i++){
+			DSVertex v = e.getItem();
+			v.color = 0;
+			v.visited = false;
+			e.getNext();
+		}
+		e = vertexList.first;
 		while(e != null){
 			DSVertex v = e.getItem();
-			System.out.print(v.label + ": ");
-			printNeighbors(v);
-			System.out.println("");
-			e = e.getNext();
-		}
+			if(v.visited == false){
+				v.visited = true;
+				vertexQueue.addLast(v);
+				DSElement<DSVertex> k = vertexQueue.first;
+				DSVertex m = k.getItem();
+				DSLinkedList<DSVertex> l = m.neighbors;
+				DSElement<DSVertex> n = l.first;
+				while(n != null){
+					DSVertex q = n.getItem();
+					if(v.color == 0 || q.color == 0)
+						q.color = 1;
+					if(v.color == 1 || q.color == 0)
+						q.color = 2;
+					else if(v.color == 2 || q.color == 0)
+						q.color = 1;
+					//System.out.print("Vertex " + q.label + " is colored: " + q.color + "\n");
+					vertexQueue.addLast(q);
+					n = n.getNext();
+
+				}
+				vertexQueue.removeFirst();
+				
+				while(k != null){
+					DSVertex q = k.getItem();
+					if(v.color == q.color)
+						return false;
+					k.getNext();
+				}
+				e.getNext();
+			}
+			else
+				e.getNext();
+
 	}
-	
-	/*
-	 * Prints the neighbors of input vertex v, separated by spaces, no newline.
-	 */
-	private void printNeighbors(DSVertex v){
-		DSLinkedList<DSVertex> n = v.neighbors;
-		DSElement<DSVertex> e = n.first;
-		while(e != null){
-			DSVertex w = e.getItem();
-			System.out.print(w.label + " ");
-			e = e.getNext();
-		}
+	return true;
+}
+
+/*
+ * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
+ * one vertex per line, all neighbors of that vertex on its line.
+ */
+public void printGraph(){
+	DSElement<DSVertex> e = vertexList.first;
+	while(e != null){
+		DSVertex v = e.getItem();
+		System.out.print(v.label + ": ");
+		printNeighbors(v);
+		System.out.println("");
+		e = e.getNext();
 	}
+}
+
+/*
+ * Prints the neighbors of input vertex v, separated by spaces, no newline.
+ */
+private void printNeighbors(DSVertex v){
+	DSLinkedList<DSVertex> n = v.neighbors;
+	DSElement<DSVertex> e = n.first;
+	while(e != null){
+		DSVertex w = e.getItem();
+		System.out.print(w.label + " ");
+		e = e.getNext();
+	}
+}
 }
