@@ -79,9 +79,44 @@ public class DSGraph {
 		return false;
 	}
 
-	public boolean shortestPath(){
-		return false;
+	
+	
+	/*
+	 * Finds the shortest path between the vertex with label 'start'
+	 * and the vertex with label 'end'
+	 * Prints the resulting path length
+	 */
+	public void shortestPath(String start, String end){
+		int distance = 0;
+		DSLinkedList<DSVertex> Q = new DSLinkedList<DSVertex>();
+		DSElement<DSVertex> e = new DSElement<DSVertex>();		
+		e.setItem(vertexWithLabel(start));
+		Q.count=1;
+		while(Q.count!=0){
+			distance++;
+			DSVertex v = e.getItem();
+			//System.out.println(v.label);
+			DSLinkedList<DSVertex> n = v.neighbors;
+			DSElement<DSVertex> f = n.first;
+			while(f != null){
+				if(f.getItem().distance==0){
+					f.getItem().distance = distance;
+					f.getItem().visited = true;
+					Q.addLast(f.getItem());
+				}
+				f = f.getNext();
+			}
+			if(e.getItem().label.equals(end)) {
+				System.out.println("Path length from \"" + start + "\" to \"" + e.getItem().label + "\" is " + e.getItem().distance);
+				return;
+			} else {
+				e.setItem(Q.removeFirst());
+			}
+		}
+		System.out.println("No path from \"" + start + "\" to \"" + end + "\" found.");
+		return;
 	}
+	
 	/*add the first point to the list
 	 * then add its neighbors that are not in the list into the list
 	 * after the list is full, compare # of items. If # of items is equal,
