@@ -84,33 +84,44 @@ public class DSGraph {
 	 * Prints the resulting path length
 	 */
 	public void shortestPath(String start, String end){
-		int distance = 0;
+		//Set all vertex distances to 0
+		DSElement<DSVertex> d = vertexList.first;
+		int count = vertexList.size();    // failsafe counter
+		while(count > 0){
+			d.getItem().distance=-1;
+			d = d.getNext();
+			count--;
+		}
+		//create queue
 		DSLinkedList<DSVertex> Q = new DSLinkedList<DSVertex>();
+		//create DSElement containing vertex of label
 		DSElement<DSVertex> e = new DSElement<DSVertex>();		
 		e.setItem(vertexWithLabel(start));
-		Q.count=1;
+		e.getItem().distance=0;
+		//add e to queue
+		Q.addLast(e.getItem());
+		//Find path from start to end
 		while(Q.count!=0){
-			distance++;
-			DSVertex v = e.getItem();
-			//System.out.println(v.label);
+			DSVertex v = Q.removeFirst();
 			DSLinkedList<DSVertex> n = v.neighbors;
 			DSElement<DSVertex> f = n.first;
 			while(f != null){
-				if(f.getItem().distance==0){
-					f.getItem().distance = distance;
-					f.getItem().visited = true;
+				if(f.getItem().distance==-1){
+					f.getItem().distance = v.distance+1;
 					Q.addLast(f.getItem());
 				}
 				f = f.getNext();
 			}
-			if(e.getItem().label.equals(end)) {
-				System.out.println("Path length from \"" + start + "\" to \"" + e.getItem().label + "\" is " + e.getItem().distance);
+			if(v.label.equals(end)) {
+				System.out.println();
+				System.out.println("Path length from \"" + start + "\" to \"" + v.label + "\" is " + v.distance);
+				System.out.println();
 				return;
-			} else {
-				e.setItem(Q.removeFirst());
-			}
+			} 
 		}
+		System.out.println();
 		System.out.println("No path from \"" + start + "\" to \"" + end + "\" found.");
+		System.out.println();
 		return;
 	}
 	
