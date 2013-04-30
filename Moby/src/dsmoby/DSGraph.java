@@ -78,6 +78,9 @@ public class DSGraph {
 	public boolean numberOfEdges(){
 		return false;
 	}
+
+	
+	
 	/*
 	 * Finds the shortest path between the vertex with label 'start'
 	 * and the vertex with label 'end'
@@ -168,34 +171,80 @@ public class DSGraph {
 	}
 
 	public boolean isBipartite(){
-		return false;
-	}
-
-	/*
-	 * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
-	 * one vertex per line, all neighbors of that vertex on its line.
-	 */
-	public void printGraph(){
 		DSElement<DSVertex> e = vertexList.first;
+		DSLinkedList<DSVertex> vertexQueue;
+		vertexQueue = new DSLinkedList<DSVertex>();
+		for(int i = 0; i < vertexList.count; i++){
+			DSVertex v = e.getItem();
+			v.color = 0;
+			v.visited = false;
+			e.getNext();
+		}
+		e = vertexList.first;
 		while(e != null){
 			DSVertex v = e.getItem();
-			System.out.print(v.label + ": ");
-			printNeighbors(v);
-			System.out.println("");
-			e = e.getNext();
-		}
-	}
+			if(v.visited == false){
+				v.visited = true;
+				vertexQueue.addLast(v);
+				DSElement<DSVertex> k = vertexQueue.first;
+				DSVertex m = k.getItem();
+				DSLinkedList<DSVertex> l = m.neighbors;
+				DSElement<DSVertex> n = l.first;
+				while(n != null){
+					DSVertex q = n.getItem();
+					if(v.color == 0 || q.color == 0)
+						q.color = 1;
+					if(v.color == 1 || q.color == 0)
+						q.color = 2;
+					else if(v.color == 2 || q.color == 0)
+						q.color = 1;
+					//System.out.print("Vertex " + q.label + " is colored: " + q.color + "\n");
+					vertexQueue.addLast(q);
+					n = n.getNext();
 
-	/*
-	 * Prints the neighbors of input vertex v, separated by spaces, no newline.
-	 */
-	private void printNeighbors(DSVertex v){
-		DSLinkedList<DSVertex> n = v.neighbors;
-		DSElement<DSVertex> e = n.first;
-		while(e != null){
-			DSVertex w = e.getItem();
-			System.out.print(w.label + " ");
-			e = e.getNext();
-		}
+				}
+				vertexQueue.removeFirst();
+				
+				while(k != null){
+					DSVertex q = k.getItem();
+					if(v.color == q.color)
+						return false;
+					k.getNext();
+				}
+				e.getNext();
+			}
+			else
+				e.getNext();
+
 	}
+	return true;
+}
+
+/*
+ * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
+ * one vertex per line, all neighbors of that vertex on its line.
+ */
+public void printGraph(){
+	DSElement<DSVertex> e = vertexList.first;
+	while(e != null){
+		DSVertex v = e.getItem();
+		System.out.print(v.label + ": ");
+		printNeighbors(v);
+		System.out.println("");
+		e = e.getNext();
+	}
+}
+
+/*
+ * Prints the neighbors of input vertex v, separated by spaces, no newline.
+ */
+private void printNeighbors(DSVertex v){
+	DSLinkedList<DSVertex> n = v.neighbors;
+	DSElement<DSVertex> e = n.first;
+	while(e != null){
+		DSVertex w = e.getItem();
+		System.out.print(w.label + " ");
+		e = e.getNext();
+	}
+}
 }

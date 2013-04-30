@@ -30,7 +30,7 @@ public class LatinPoet {
 		rightNow = Calendar.getInstance();
 		int startMin = rightNow.get(rightNow.MINUTE);
 		int startSec = rightNow.get(rightNow.SECOND);
-	writeDactylLine();
+	//writeDactylLine();
 		rightNow = Calendar.getInstance();
 		int endMin = rightNow.get(rightNow.MINUTE);
 		int endSec = rightNow.get(rightNow.SECOND);
