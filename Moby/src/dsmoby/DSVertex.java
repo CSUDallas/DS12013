@@ -6,6 +6,8 @@ public class DSVertex implements Comparable<DSVertex>{
 	public boolean visited;
 	public int color;
 	public int distance;
+	public DSVertex parent;
+	
 	/*
 	 * Constructs an unlabeled vertex
 	 */

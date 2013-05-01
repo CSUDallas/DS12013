@@ -205,6 +205,11 @@ public class ServumVerbi {
 				//insert macrons into forms
 				macsToForms(w.getItem());
 				//System.out.println(w.getItem().macForm);
+				//Insert special macrons into verbs
+				if(w.getItem().pos.equals("V")){
+					specialMacs(w.getItem());
+					//System.out.println(w.getItem().form3 + " " + w.getItem().form4);
+				}
 			}
 			w = w.getNext();
 			if(w == null)
@@ -250,9 +255,51 @@ public class ServumVerbi {
 			c++;
 		}	
 	}
+	/*
+	 * Inserts macrons into special verbs which follow a pattern
+	 * E.g. 1 conj verbs have long a in 3rd and 4th pp
+	 */
+	public void specialMacs(Verbum w){
+		int conj = w.cd;
+		int variant = w.variant;
+		int i = 0;
+		int index = 0;
+		
+		if(conj==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
+			do {
+				char c = w.form3.charAt(i);
+				if(isVowel(c)){
+					index = i;
+				}
+				i++;
+			} while(i<w.form3.length()-1);
+			w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
+		}
+		if (conj==1 && variant==1){
+			w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
+			w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+		}
+	}
+	//Tests if char is vowel
+	public static boolean isVowel(char ch) {
+		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y';
+	}
+	//Calculates the syllable count
+	public int countSyllables(String s){
+		s = s.replace("qu", "q");
+		int i = 0;
+		int count = 0;
+		do {
+			char c = s.charAt(i);
+			if(isVowel(c)){
+				count++;
+			}
+			i++;
+		} while(i<s.length()-1);
+		return count;		
+	}
 	//-----END Macron Methods-----//
-
-
+	
 	public Verbum getWord(){
 		// Pick random starting point in the linked list
 		int start = (int)(Math.random() * tempWords.size());
@@ -260,8 +307,6 @@ public class ServumVerbi {
 		for(int i = 0; i < start; i++)
 			w = w.getNext();
 		return w.getItem();
-		// From this point, find the first word (weakly)matching our stresses pattern
-
 	}
 
 	public Verbum getWord(String pos, char freqLevel){
