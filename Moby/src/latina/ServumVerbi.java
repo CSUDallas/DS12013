@@ -593,7 +593,7 @@ public class ServumVerbi {
 						ending.getItem().voice.equals(voice) && 
 						ending.getItem().mood.equals(mood)) {
 					form = getForm(w, ending.getItem().form);
-					if(form.equals("zzz")){
+					if(form.replace("*", "").equals("zzz")){
 						cw.item = "none";
 						return w;
 					} else {
