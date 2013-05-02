@@ -206,10 +206,10 @@ public class ServumVerbi {
 				macsToForms(w.getItem());
 				//System.out.println(w.getItem().macForm);
 				//Insert special macrons into verbs
-				if(w.getItem().pos.equals("V")){
+				//if(w.getItem().pos.equals("V")){
 					specialMacs(w.getItem());
 					//System.out.println(w.getItem().form3 + " " + w.getItem().form4);
-				}
+				//}
 			}
 			w = w.getNext();
 			if(w == null)
@@ -256,28 +256,36 @@ public class ServumVerbi {
 		}	
 	}
 	/*
-	 * Inserts macrons into special verbs which follow a pattern
+	 * Inserts macrons into special verba which follow a pattern
 	 * E.g. 1 conj verbs have long a in 3rd and 4th pp
 	 */
 	public void specialMacs(Verbum w){
-		int conj = w.cd;
+		int cd = w.cd;
 		int variant = w.variant;
 		int i = 0;
 		int index = 0;
-		
-		if(conj==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
-			do {
-				char c = w.form3.charAt(i);
-				if(isVowel(c)){
-					index = i;
-				}
-				i++;
-			} while(i<w.form3.length()-1);
-			w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
-		}
-		if (conj==1 && variant==1){
-			w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
-			w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+		if(w.pos.equals("V")){
+			//3rd conjugation have long vowel if the 1st pp stem and 3rd pp stem are one syllable
+			if(cd==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
+				do {
+					char c = w.form3.charAt(i);
+					if(isVowel(c)){
+						index = i;
+					}
+					i++;
+				} while(i<w.form3.length()-1);
+				w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
+			}
+			//First conjugation variant 1 have long a's 
+			if (cd==1 && variant==1){
+				w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
+				w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+			}
+		} else if (w.pos.equals("N")){
+			//3rd declension nouns have short o in nom and long o in all other forms
+			if (cd == 3 && w.form2.charAt(w.form2.length()-1) == 'r' && (w.gender.equals("M") || w.gender.equals("F"))){
+				w.form2 = new StringBuffer(w.form2).insert(w.form2.length()-2, "*").toString();
+			}
 		}
 	}
 	//Tests if char is vowel
@@ -299,7 +307,7 @@ public class ServumVerbi {
 		return count;		
 	}
 	//-----END Macron Methods-----//
-	
+
 	public Verbum getWord(){
 		// Pick random starting point in the linked list
 		int start = (int)(Math.random() * tempWords.size());

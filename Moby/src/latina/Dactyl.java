@@ -200,6 +200,7 @@ public class Dactyl {
 		s = s.replace(" h", "");
 		s = elisions(s);
 		s = s.replace(" ", "");
+		
 		//System.out.println(s);
 		int i = 0;
 		do {
@@ -217,7 +218,7 @@ public class Dactyl {
 						i++;
 					}			
 				} else {
-					if(s.length()>3){
+					if(s.length()>2){
 						if(isVowel(s.charAt(i+2))){
 							m = m + " 0"; //vowel + single consonant, short
 							i=i+2;
@@ -226,16 +227,16 @@ public class Dactyl {
 							i=i+3;
 						}
 					} else {
-						if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
-							m = m + " 1"; //vowel + double consonant, long
+						//if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
+						//	m = m + " 1"; //vowel + double consonant, long
+						//	i=i+3;
+						//if(isVowel(s.charAt(i+2))){
+						////	m = m + " 0"; //vowel + single consonant, short
+						//i=i+1;
+					//} else {
+							m = m + " 0"; //vowel + double consonant, long
 							i=i+3;
-						} else if(isVowel(s.charAt(i+1))){
-							m = m + " 0"; //vowel + single consonant, short
-							i=i+1;
-						} else {
-							m = m + " 1"; //vowel + double consonant, long
-							i=i+3;
-						}
+					//	}
 					}
 				}		
 			} else {
