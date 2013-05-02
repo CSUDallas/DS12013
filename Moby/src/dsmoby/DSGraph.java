@@ -88,8 +88,8 @@ public class DSGraph {
 		return edges;
 	}
 
-
-
+	
+	
 	/*
 	 * Finds the shortest path between the vertex with label 'start'
 	 * and the vertex with label 'end'
@@ -109,10 +109,6 @@ public class DSGraph {
 		//create DSElement containing vertex of label
 		DSElement<DSVertex> e = new DSElement<DSVertex>();		
 		e.setItem(vertexWithLabel(start));
-		if(e.getItem() == null){
-			System.out.println("Word " + start + " not in list.");
-			return;
-		}
 		e.getItem().distance=0;
 		e.getItem().parent = null;
 		//add e to queue
@@ -148,12 +144,13 @@ public class DSGraph {
 		System.out.println();
 		return;
 	}
-
+	
 	/*add the first point to the list
 	 * then add its neighbors that are not in the list into the list
 	 * after the list is full, compare # of items. If # of items is equal,
 	 *  then list is connected. 
 	 */
+	
 	public boolean isConnected(){
 		DSLinkedList<DSVertex> connectedVertices;
 		DSElement<DSVertex> k = vertexList.first; 
@@ -167,7 +164,7 @@ public class DSGraph {
 		t.getItem().visited = true;
 
 		while (connectedVertices.first != null){
-			// System.out.println(connectedVertices.first.getItem().label);
+			//System.out.println(connectedVertices.first.getItem().label);
 			DSElement<DSVertex> j = connectedVertices.first.getItem().neighbors.first;
 			while (j != null){
 				connectedVertices.addLast(j.getItem());
@@ -175,13 +172,12 @@ public class DSGraph {
 					connectedVertices.removeLast();
 				}
 				connectedVertices.last.getItem().visited = true;
-				// System.out.println("innerloop" + j.getItem().label);
+				//System.out.println("innerloop" + j.getItem().label);
 				j = (j.getNext());
 			}
 			connectedVertices.removeFirst();
-			// System.out.println("ilooped" + connectedVertices.count);
+			//System.out.println("ilooped" + connectedVertices.count);
 		}
-
 		DSElement<DSVertex> r = vertexList.first; 
 		while (r != null){
 			if (r.getItem().visited == true){
@@ -195,7 +191,6 @@ public class DSGraph {
 	public boolean isBipartite(){
 		DSElement<DSVertex> e = vertexList.first;
 		DSLinkedList<DSVertex> vertexQueue;
-
 		vertexQueue = new DSLinkedList<DSVertex>();
 		for(int i = 0; i < vertexList.count; i++){
 			DSVertex v = e.getItem();
@@ -203,7 +198,6 @@ public class DSGraph {
 			v.visited = false;
 			e.getNext();
 		}
-
 		e = vertexList.first;
 		while(e != null){
 			DSVertex v = e.getItem();
@@ -228,7 +222,7 @@ public class DSGraph {
 
 				}
 				vertexQueue.removeFirst();
-
+				
 				while(k != null){
 					DSVertex q = k.getItem();
 					if(v.color == q.color)
@@ -240,89 +234,35 @@ public class DSGraph {
 			else
 				e.getNext();
 
-		}
-		return true;
 	}
-	
-	/*
-	 * Returns true if and only if the graph can be 3-colored
-	 */
-	String cs = "";
-	public boolean isThreeColorable(){
-		if(vertexList.count <= 3)	// Small graphs are 3-colorable
-			return true;
-		// Initialize all colors to -1
-		DSElement<DSVertex> v = vertexList.first;
-		while(v != null){
-			v.getItem().color = -1;
-			v = v.getNext();
-		}
-		
-		v = vertexList.first;
-		return isThreeColorableRecursion(v);
-		
-	}
-	
-	/*
-	 * Recursive step for isThreeColorable()
-	 * Returns true if the coloring up to but not including vertex v
-	 * can be extended to a coloring of the whole graph, false otherwise.
-	 * 
-	 * It is assumed that the colors assigned so far constitute a valid coloring.
-	 */
-	private boolean isThreeColorableRecursion(DSElement<DSVertex> v){
-		if(v == null)	// Whole graph is already colored!
-			return true;
+	return true;
+}
 
-		for(int i = 0; i < 3; i++){
-			cs = cs + i;
-			//System.out.println(cs);
-			DSElement<DSVertex> nbr = v.getItem().neighbors.first;
-			boolean goodColor = true;
-			while(nbr != null){
-				if(nbr.getItem().color == i){
-					goodColor = false;
-					break;
-				}
-				nbr = nbr.getNext();
-			}
-			if(goodColor){
-				v.getItem().color = i;
-				if(isThreeColorableRecursion(v.getNext()))
-					return true;
-				v.getItem().color = -1;
-			}
-			cs = cs.substring(0, cs.length() - 1);
-		}
-		
-		return false;
+/*
+ * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
+ * one vertex per line, all neighbors of that vertex on its line.
+ */
+public void printGraph(){
+	DSElement<DSVertex> e = vertexList.first;
+	while(e != null){
+		DSVertex v = e.getItem();
+		System.out.print(v.label + ": ");
+		printNeighbors(v);
+		System.out.println("");
+		e = e.getNext();
 	}
-	
-	/*
-	 * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
-	 * one vertex per line, all neighbors of that vertex on its line.
-	 */
-	public void printGraph(){
-		DSElement<DSVertex> e = vertexList.first;
-		while(e != null){
-			DSVertex v = e.getItem();
-			System.out.print(v.label + ": ");
-			printNeighbors(v);
-			System.out.println("");
-			e = e.getNext();
-		}
-	}
+}
 
-	/*
-	 * Prints the neighbors of input vertex v, separated by spaces, no newline.
-	 */
-	private void printNeighbors(DSVertex v){
-		DSLinkedList<DSVertex> n = v.neighbors;
-		DSElement<DSVertex> e = n.first;
-		while(e != null){
-			DSVertex w = e.getItem();
-			System.out.print(w.label + " ");
-			e = e.getNext();
-		}
+/*
+ * Prints the neighbors of input vertex v, separated by spaces, no newline.
+ */
+private void printNeighbors(DSVertex v){
+	DSLinkedList<DSVertex> n = v.neighbors;
+	DSElement<DSVertex> e = n.first;
+	while(e != null){
+		DSVertex w = e.getItem();
+		System.out.print(w.label + " ");
+		e = e.getNext();
 	}
+}
 }

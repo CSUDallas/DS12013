@@ -6,14 +6,13 @@ public class GraphTester {
 		DSGraph g= new DSGraph("Not3Colorable.graph");
 		//g.printGraph();
 		
-		//g.isConnected();
+		g.isConnected();
 		if(g.isConnected()){
 			System.out.print("yay.\n");
 		}
 		else 	
 			System.out.print("nay\n");
-	
-		//g.shortestPath("ally", "hike");
-		System.out.println("Graph can be three-colored: " + g.isThreeColorable());
+		
+		//g.shortestPath("ally", "ably");
 	}
 }
