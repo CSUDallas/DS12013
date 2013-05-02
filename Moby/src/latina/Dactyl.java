@@ -9,7 +9,7 @@ public class Dactyl {
 	private static Calendar rightNow;
 	public static String line;
 	public static int iterations;
-	public static int numLines = 5;
+	public static int numLines = 1;
 
 	public static void main(String[] args) {
 		sv = new ServumVerbi("DICTLINERAND.GEN",
@@ -273,7 +273,7 @@ public class Dactyl {
 		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y' || ch == '*';
 	}
 	public static boolean isDipthong(String s) {
-		return s.equals("ae") || s.equals("au") || s.equals("ei") || s.equals("eu") || s.equals("oe") || s.equals("ui") || s.equals("ii");
+		return s.equals("ae") || s.equals("au") || s.equals("ei") || s.equals("eu") || s.equals("oe"); // || s.equals("ii");
 	}
 	public static String elisions(String s){
 		String[] vowels = {"a", "e", "i", "o", "u"};
