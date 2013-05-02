@@ -244,12 +244,60 @@ public class DSGraph {
 		return true;
 	}
 	
+	/*
+	 * Returns true if and only if the graph can be 3-colored
+	 */
+	String cs = "";
 	public boolean isThreeColorable(){
+		if(vertexList.count <= 3)	// Small graphs are 3-colorable
+			return true;
+		// Initialize all colors to -1
+		DSElement<DSVertex> v = vertexList.first;
+		while(v != null){
+			v.getItem().color = -1;
+			v = v.getNext();
+		}
+		
+		v = vertexList.first;
+		return isThreeColorableRecursion(v);
+		
+	}
+	
+	/*
+	 * Recursive step for isThreeColorable()
+	 * Returns true if the coloring up to but not including vertex v
+	 * can be extended to a coloring of the whole graph, false otherwise.
+	 * 
+	 * It is assumed that the colors assigned so far constitute a valid coloring.
+	 */
+	private boolean isThreeColorableRecursion(DSElement<DSVertex> v){
+		if(v == null)	// Whole graph is already colored!
+			return true;
+
+		for(int i = 0; i < 3; i++){
+			cs = cs + i;
+			//System.out.println(cs);
+			DSElement<DSVertex> nbr = v.getItem().neighbors.first;
+			boolean goodColor = true;
+			while(nbr != null){
+				if(nbr.getItem().color == i){
+					goodColor = false;
+					break;
+				}
+				nbr = nbr.getNext();
+			}
+			if(goodColor){
+				v.getItem().color = i;
+				if(isThreeColorableRecursion(v.getNext()))
+					return true;
+				v.getItem().color = -1;
+			}
+			cs = cs.substring(0, cs.length() - 1);
+		}
+		
 		return false;
 	}
-
-
-
+	
 	/*
 	 * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
 	 * one vertex per line, all neighbors of that vertex on its line.
