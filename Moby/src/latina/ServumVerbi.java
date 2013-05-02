@@ -283,7 +283,7 @@ public class ServumVerbi {
 			}
 		} else if (w.pos.equals("N")){
 			//3rd declension nouns have short o in nom and long o in all other forms
-			if (cd == 3 && w.form2.charAt(w.form2.length()-1) == 'r' && (w.gender.equals("M") || w.gender.equals("F"))){
+			if (cd == 3 && w.form1.charAt(w.form1.length()-1) == 'r' && w.form2.charAt(w.form2.length()-1) == 'r' && (w.gender.equals("M") || w.gender.equals("F"))){
 				w.form2 = new StringBuffer(w.form2).insert(w.form2.length()-2, "*").toString();
 			}
 		}

@@ -9,7 +9,7 @@ public class Dactyl {
 	private static Calendar rightNow;
 	public static String line;
 	public static int iterations;
-	public static int numLines = 1;
+	public static int numLines = 14;
 
 	public static void main(String[] args) {
 		sv = new ServumVerbi("DICTLINERAND.GEN",
@@ -29,8 +29,8 @@ public class Dactyl {
 				line = writeDactylLine();
 				iterations++;
 			} while (!meterMatch(getMeter(line)));		
-			System.out.println(line.replace("*", "") + "\n" + line + "\n" + getMeter(line) + "\nWords tried: " + wordCounter + ". Lines tried: " + iterations + ". \n");
-			//System.out.println(line.replace("*", ""));
+			//System.out.println(line.replace("*", "") + "\n" + line + "\n" + getMeter(line) + "\nWords tried: " + wordCounter + ". Lines tried: " + iterations + ". \n");
+			System.out.println(line.replace("*", ""));
 		}
 
 		rightNow = Calendar.getInstance();
@@ -38,12 +38,6 @@ public class Dactyl {
 		int endSec = rightNow.get(rightNow.SECOND);
 		int time = (endMin-startMin)*60 + endSec-startSec;
 		System.out.println("Time elapsed (sec): " + time);
-		//System.out.println(getMeter("arma virumque cano troiae qui pr*imus ab *or*is"));
-		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
-		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
-		//System.out.println(getMeter("arma virumque cano tr*iae qui pr*imus ab *or*is"));
-		//arm av ir umqu ec an otr oi aequ ipr im us ab or is
-		//1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
 	}
 
 	public static Verbum randDactylWord(Verbum v, String pos, String c, String num, int p, String tense, String voice, String mood, String s){
@@ -53,7 +47,6 @@ public class Dactyl {
 		while(i<100){
 			wordCounter++;
 			int rand = (int)(Math.random()*10);
-
 			if(rand<4){
 				if(rand<1){
 					w = sv.nGetTerminus(sv.getWord("N", 'B'), c, "P");
@@ -65,7 +58,7 @@ public class Dactyl {
 			} else {
 				w = sv.vGetTerminus(sv.getWord("V", 'B'), p, v.cw.number, tense, voice, mood);
 			}
-			if(w.cw.item!=""){//!w.cw.item.contains("MALUM")){
+			if(w.cw.item!=""){
 				if(getMeter(w.cw.item).length()<7){					
 					if(dactylMeter(s + w.cw.item)){
 						return w;
@@ -104,7 +97,8 @@ public class Dactyl {
 		return w;
 	}
 	public static boolean meterMatch(String s){
-		//Dactylic Hexameter
+		//Dactylic Hexameter - some possibilities - there are more
+		//Foot is either 1 1 or 1 0 0 - Must end in 1 0 0 1 1
 		if(s.equals(" 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 1"))
 			return true;
 		else if(s.equals(" 1 1 1 0 0 1 0 0 1 0 0 1 0 0 1 1"))
@@ -119,7 +113,7 @@ public class Dactyl {
 			return true;
 		else if(s.equals(" 1 1 1 1 1 0 0 1 1 1 0 0 1 1"))
 			return true;
-		else if(s.equals(" 1 1 1 0 0 1 0 0 1 0 0 1 1 1 1"))
+		else if(s.equals(" 1 1 1 0 0 1 1 1 0 0 1 0 0 1 1"))
 			return true;
 		else if(s.equals(" 1 1 1 0 0 1 0 0 1 1 1 0 0 1 1"))
 			return true;
@@ -127,6 +121,8 @@ public class Dactyl {
 			return true;
 		else if(s.equals(" 1 0 0 1 1 1 0 0 1 0 0 1 0 0 1 1"))
 			return true;
+		//else if(s.equals(" 1 0 0 1 1 1 0 0 1 0 0 1 1 1 1"))
+		//	return true;
 		return false;
 	}
 
@@ -145,7 +141,7 @@ public class Dactyl {
 		K = K + ob3.cw.item + " ";
 		Verbum adj3 = randDactylWord(ob3, "A", "ABL", "S", 0, "", "", "", K);
 		K = K + adj3.cw.item + " ";
-		Verbum v2= randDactylWord(sub2, "V", "", "P", 3, "PERF", "ACTIVE", "IND", K);
+		Verbum v2= randDactylWord(sub2, "V", "", "P", 3, "FUT", "ACTIVE", "IND", K);
 		K = K + v2.cw.item;
 
 		return K;
@@ -192,6 +188,7 @@ public class Dactyl {
 		 * //a arp ath i umj uc und it at amm oen itqu oqu e
 		 * //0 1   1   0 1   0  1   0  0   1   1   1    1   0
 		 * System.out.println(getMeter("arma virumque cano troiae qui primus ab oris"));
+		 * System.out.println(getMeter("arma virumque cano tr*iae qui pr*imus ab *or*is"));
 		 * //arm av ir umqu ec an otr oi aequ ipr im us ab or is
 		 * //1   0  0  1    0  0  1   1  1    1   1  0  0  1  1 
 		 */
@@ -200,7 +197,6 @@ public class Dactyl {
 		s = s.replace(" h", "");
 		s = elisions(s);
 		s = s.replace(" ", "");
-		
 		//System.out.println(s);
 		int i = 0;
 		do {
@@ -227,16 +223,8 @@ public class Dactyl {
 							i=i+3;
 						}
 					} else {
-						//if(s.charAt(i+1)=='q' && s.charAt(i+2)=='u'){
-						//	m = m + " 1"; //vowel + double consonant, long
-						//	i=i+3;
-						//if(isVowel(s.charAt(i+2))){
-						////	m = m + " 0"; //vowel + single consonant, short
-						//i=i+1;
-					//} else {
-							m = m + " 0"; //vowel + double consonant, long
-							i=i+3;
-					//	}
+						m = m + " 0"; //word is only 2 chars, therefore short
+						i=i+3;
 					}
 				}		
 			} else {
