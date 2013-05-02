@@ -291,7 +291,20 @@ public class DSGraph {
 
 		return false;
 	}
-
+/*
+ * count the number of connected components od the graph
+ */
+	public int numComponents(){
+		DSLinkedList<DSVertex> stack = new DSLinkedList<DSVertex>();
+		DSVertex v = vertexList.first.getItem();//XXX will be modified
+		while(v != null){
+			stack.addLast(v);
+			
+		}
+		
+		
+		
+	}
 
 /*
  * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
