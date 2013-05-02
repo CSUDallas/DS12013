@@ -69,6 +69,21 @@ public class DSLinkedList<E extends Comparable> {
 		return count;
 	}
 	
+
+public boolean conTains (E X){
+    DSElement<E> e = first;
+    if (e == null)
+    	return false;
+	while (e != null){
+    if (e != X)
+		e = e.getNext();
+	if (e == X)
+		return true;
+	}
+	return false; 
+}
+	
+
 	public void bubbleSort(){
 		for(int i = 0; i < count; i++){
 			DSElement<E> e = first;

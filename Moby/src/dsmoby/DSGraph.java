@@ -110,6 +110,7 @@ public class DSGraph {
 		DSElement<DSVertex> e = new DSElement<DSVertex>();		
 		e.setItem(vertexWithLabel(start));
 		e.getItem().distance=0;
+		e.getItem().parent = null;
 		//add e to queue
 		Q.addLast(e.getItem());
 		//Find path from start to end
@@ -120,6 +121,7 @@ public class DSGraph {
 			while(f != null){
 				if(f.getItem().distance==-1){
 					f.getItem().distance = v.distance+1;
+					f.getItem().parent = v;
 					Q.addLast(f.getItem());
 				}
 				f = f.getNext();
@@ -127,6 +129,12 @@ public class DSGraph {
 			if(v.label.equals(end)) {
 				System.out.println();
 				System.out.println("Path length from \"" + start + "\" to \"" + v.label + "\" is " + v.distance);
+				System.out.println();
+				DSVertex w = v;
+				while(w != null){
+					System.out.print(w.label + "-");
+					w = w.parent;
+				}
 				System.out.println();
 				return;
 			} 
@@ -142,8 +150,9 @@ public class DSGraph {
 	 * after the list is full, compare # of items. If # of items is equal,
 	 *  then list is connected. 
 	 */
-	public DSLinkedList<DSVertex> connectedVertices;
+	
 	public boolean isConnected(){
+		DSLinkedList<DSVertex> connectedVertices;
 		DSElement<DSVertex> k = vertexList.first; 
 		while (k != null){
 			k.getItem().visited = false;
@@ -155,7 +164,7 @@ public class DSGraph {
 		t.getItem().visited = true;
 
 		while (connectedVertices.first != null){
-			System.out.println(connectedVertices.first.getItem().label);
+			//System.out.println(connectedVertices.first.getItem().label);
 			DSElement<DSVertex> j = connectedVertices.first.getItem().neighbors.first;
 			while (j != null){
 				connectedVertices.addLast(j.getItem());
@@ -163,11 +172,11 @@ public class DSGraph {
 					connectedVertices.removeLast();
 				}
 				connectedVertices.last.getItem().visited = true;
-				System.out.println("innerloop" + j.getItem().label);
+				//System.out.println("innerloop" + j.getItem().label);
 				j = (j.getNext());
 			}
 			connectedVertices.removeFirst();
-			System.out.println("ilooped" + connectedVertices.count);
+			//System.out.println("ilooped" + connectedVertices.count);
 		}
 		DSElement<DSVertex> r = vertexList.first; 
 		while (r != null){
