@@ -27,6 +27,9 @@
 ———————————♥
 */
 package dsmoby;
+
+import java.util.*;
+
 //look i added something very special, more special than you can imagine
 public class Poet {
 	private static Moby moby;
@@ -237,4 +240,149 @@ public class Poet {
 		
 		return dd;
 	}
+
+	public static String writeHaiku(String haiku)
+	{
+		String Haiku = haiku;
+		String haikus = "";
+		StringTokenizer tokenizer = new StringTokenizer(Haiku, "\n");
+		
+		
+		String ln1 = tokenizer.nextToken();
+		String ln2 = tokenizer.nextToken();
+		String ln3 = tokenizer.nextToken();
+		
+		StringTokenizer tok1 = new StringTokenizer(ln1, " ");
+		StringTokenizer tok2 = new StringTokenizer(ln2, " ");
+		StringTokenizer tok3 = new StringTokenizer(ln3, " ");
+		
+		//String[] lin1 = new String[tok1.countTokens()];
+		//String[] lin2 = new String[tok2.countTokens()];
+		//String[] lin3 = new String[tok3.countTokens()];
+		
+		/*
+		int ls1 = tok1.countTokens();
+		int ls2 = tok2.countTokens();
+		int ls3 = tok3.countTokens();
+		*/
+		
+		syllableWorker j = new syllableWorker("SyllablesP1.txt");
+				
+		while(tok1.hasMoreTokens())
+		{
+			String l = tok1.nextToken();
+			int a = l.length();	
+			//System.out.println(l.contains("'s"));
+			if(l.contains("'s"))
+			{
+				int b = 0;
+				int c = a - 2;
+				l = l.substring(b,c);
+			}
+			else if((l.charAt(a-1) == 's') && !(l.charAt(a-2) == 'e'))
+			{
+				int b = 0;
+				int c = a - 1;
+				l = l.substring(b,c);
+			}
+			Random rand = new Random();
+			int end = rand.nextInt(40000);
+			haikus += j.syllableCountSyllables(j.syllableCountWord(l), end) + " ";
+			
+			//int x = 0;
+			//String z = tok1.nextToken();
+			//System.out.println(z);
+			//lin1[x] = z;
+			//System.out.println(lin1[x]);
+			//x++;
+		}
+		haikus += "\n";
+		while(tok2.hasMoreTokens())
+		{
+			String l = tok2.nextToken();
+			int a = l.length();	
+			//System.out.println(l.contains("'s"));
+			if(l.contains("'s"))
+			{
+				int b = 0;
+				int c = a - 2;
+				l = l.substring(b,c);
+			}
+			else if((l.charAt(a-1) == 's') && !(l.charAt(a-2) == 'e'))
+			{
+				int b = 0;
+				int c = a - 1;
+				l = l.substring(b,c);
+			}
+			//System.out.println("2 + " + l);
+			Random rand = new Random();
+			int end = rand.nextInt(40000);
+			haikus += j.syllableCountSyllables(j.syllableCountWord(l), end) + " ";
+			
+			//int y = 0;
+			//lin2[y] = tok2.nextToken();
+			//y++;
+		}
+		haikus += "\n";
+		while(tok3.hasMoreTokens())
+		{
+			String l = tok3.nextToken();
+			int a = l.length();			
+			if(l.contains("'s"))
+			{
+				int b = 0;
+				int c = a - 2;
+				l = l.substring(b,c);
+			}
+			else if((l.charAt(a-1) == 's') && !(l.charAt(a-2) == 'e'))
+			{
+				int b = 0;
+				int c = a - 1;
+				l = l.substring(b,c);
+			}
+			//System.out.println("3 + " + l);
+			Random rand = new Random();
+			int end = rand.nextInt(40000);
+			haikus += j.syllableCountSyllables(j.syllableCountWord(l), end) + " ";
+			
+			//int z = 0;
+			//lin3[z] = tok3.nextToken();
+			//z++;
+		}
+		haikus += "\n";
+		//System.out.println(lin1[0]);
+		
+		/*
+		for(int x = 0; x < ls1; x++)
+		{
+			String wd = ln1W[x];
+			//System.out.println(wd);
+			
+		}
+		haiku += "\n";
+		for(int x = 0; x < ls2; x++)
+		{
+			String wd = ln2W[x];
+			
+			haiku += j.syllableCountSyllables(j.syllableCountWord(wd)) + " ";
+		}
+		haiku += "\n";
+		for(int x = 0; x < ls3; x++)
+		{
+			String wd = ln3W[x];
+			
+			haiku += j.syllableCountSyllables(j.syllableCountWord(wd)) + " ";
+		}
+		haiku += "\n";
+		
+		//return haikuFinished = constructWriteHaiku(lin1,ls1,lin2,ls2,lin3,ls3);
+		*/
+		
+		return haikus;
+	}
+
+
 }
+
+
+

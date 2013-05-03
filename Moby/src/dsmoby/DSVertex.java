@@ -24,6 +24,20 @@ public class DSVertex implements Comparable<DSVertex>{
 		distance=0;
 	}
 	
+	public boolean compareNeighborsColors(){
+		DSElement<DSVertex> e = neighbors.first;
+		while(e != null){
+			DSVertex w = e.getItem();
+			if(w.color == color)
+			{
+				return false;
+			}
+			e = e.getNext();
+		}
+		
+		return true;
+	}
+	
 	/*
 	 * 
 	 */

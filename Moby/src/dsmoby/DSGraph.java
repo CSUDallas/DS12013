@@ -305,6 +305,67 @@ public class DSGraph {
 		
 		
 	}
+	
+	
+	public boolean isBipartite2()
+	{
+		DSElement<DSVertex> e = vertexList.first;
+		//makes sure all colors and visited values are set the default
+		for(int i = 0; i < vertexList.count; i++)
+		{
+			DSVertex v = e.getItem();
+			v.color = 0;
+			v.visited = false;
+			//System.out.println(v.label + " " +  v.color); //debugging code
+			e = e.getNext();
+		}
+
+		//The element that will be used to travel through the list
+		DSElement<DSVertex> start = vertexList.first;
+
+		//The first vertex is hard coded to color as 1 and visited as true
+		DSVertex starter = start.getItem();
+		starter.color = 1;
+		starter.visited = true;
+		//colors and checks the graph for two colorableness
+		DSLinkedList<DSVertex> loopy = starter.neighbors;
+		for(int x = 1; x < vertexList.count; x++)
+		{
+			//System.out.println("bump"); //debugging code
+
+			//Loops through the neighbors coloring them as needed and making sure the graph is still legal
+			DSElement<DSVertex> vertPro = loopy.first;
+			for(int z = 0; z < loopy.count; z++)
+			{
+				DSVertex vert = vertPro.getItem();
+				if(vert.visited == false)
+				{
+					vert.color = 1;
+					vert.visited = true;
+					if(!(vert.compareNeighborsColors()))
+					{
+						vert.color = 2;
+						//the actual check to see if the graph is legal. If this is false the graph isn't bipartite
+						if(!(vert.compareNeighborsColors()))
+						{
+							//System.out.println(vert.label + " was the location of the failure"); //debugging code
+							return false;
+						}
+					}
+					//System.out.println(vert.label + " " + vert.color); //debugging code
+
+				}
+				vertPro = vertPro.getNext();	
+			}
+			//Grabs the next vertex in the list so the process can continue
+			start = start.getNext();
+			//System.out.println(start.getItem().label); //debugging code
+			loopy = start.getItem().neighbors;
+		}
+
+		return true;
+	}
+	
 
 /*
  * Prints the graph as a list of   vertex: neighbor1 neighbor2 neighbor3 ...
