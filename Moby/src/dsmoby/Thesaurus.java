@@ -1,5 +1,5 @@
 package dsmoby;
 
-public class thesaurus {
+public class Thesaurus {
 
 }
