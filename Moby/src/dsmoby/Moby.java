@@ -27,6 +27,7 @@ public class Moby {
 				words.insert(m);
 				wordsList.addLast(m);
 			}
+			reader.close();
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
@@ -54,6 +55,7 @@ public class Moby {
 
 				linesRead++;
 			}
+			reader.close();
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
@@ -81,6 +83,7 @@ public class Moby {
 
 				linesRead++;
 			}
+			reader.close();
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
@@ -96,7 +99,7 @@ public class Moby {
 			int linesRead = 0;
 			while ((line = reader.readLine()) != null) {
 				if(linesRead % 10000 == 0)
-					System.out.print("" + (int)(linesRead * 100 / 112505) + "% ");	
+					System.out.print("" + (int)(linesRead * 100 / 112503) + "% ");	
 				line = line.replaceAll("[\\?,~<0123456!]", "");	
 				//line = line.replaceAll("\\{.*\\}", "");
 				String[] parts = line.split(" ");
@@ -104,7 +107,10 @@ public class Moby {
 				MobyWord w;
 				if(parts[1].charAt(0) == 'N'){ // Noun case
 					w = findWordPOS(wordbase, words.root, "N");
-					if(w == null) continue;
+					if(w == null){
+						linesRead++;
+						continue;
+					}
 					int numPlurals = parts.length - 2;
 					if(w != null && numPlurals > 0)
 						w.pluralForm = parts[2];
@@ -116,7 +122,10 @@ public class Moby {
 				} 
 				else if(parts[1].charAt(0) == 'V'){ // Verb case
 					w = findWordPOS(wordbase, words.root, "Vti");
-					if(w == null) continue;
+					if(w == null){
+						linesRead++;
+						continue;
+					}
 					boolean hasParticiple = line.matches(".*\\|.*\\|.*\\|.*");
 					int verbPartsStart = line.indexOf(":") + 1;
 					String verbLine = line.substring(verbPartsStart);
@@ -141,8 +150,10 @@ public class Moby {
 					// Set the verb form's other fields
 					for(int i = 0; i < verbParts.length; i++){
 						MobyWord w2  = findWord(verbParts[i], words.root);
-						if(w2 == null)
+						if(w2 == null){
+							linesRead++;
 							continue;
+						}
 						w2.baseVerbForm = wordbase;
 						w2.pastForm = verbParts[0];
 						if(i == 0)
@@ -169,12 +180,14 @@ public class Moby {
 				} 
 				else if(parts[1].charAt(0) == 'A'){		// Adjective / Adverb Form
 					w = findWordPOS(wordbase, words.root, "Av");
-					if(w == null) continue;
+					if(w == null){
+						linesRead++;
+						continue;
+					}
 					//System.out.println(line);
 					int adPartsStart = line.indexOf(":") + 1;
 					String adLine = line.substring(adPartsStart);
 					String[] adParts = adLine.split("\\|");
-					int nvp = adParts.length;
 					for(int i = 0; i < adParts.length; i++){ // Restrict to only most common variant
 						String[] adPartParts = adParts[i].trim().split(" ");
 						adParts[i] = adPartParts[0].trim();
@@ -200,10 +213,50 @@ public class Moby {
 				}
 				linesRead++;
 			}
+			reader.close();
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
 		System.out.println("Done.");
+	}
+	
+	
+	/*
+	 * Set a thesaurus for the Moby
+	 * Fills the MobyWords with synonyms in the "synonyms" DSLinkedList
+	 */
+	public void setSynonyms(String synFile){
+		System.out.println("** Reading Thesaurus: ");
+		try { 
+			FileReader f = new FileReader(synFile);
+			BufferedReader reader = new BufferedReader(f);
+			String line = null;
+			int linesRead = 0;
+			int found = 0;
+			int numSynonyms = 0;
+			while ((line = reader.readLine()) != null) {
+				if(linesRead % 2000 == 0)
+					System.out.print("" + (int)(linesRead * 100 / 30260) + "% ");	
+				String[] parts = line.split(",");
+				MobyWord w = findWord(parts[0], words.root);
+				if(w != null){
+					found++;
+					for(int i = 1; i < parts.length; i++){
+						MobyWord s = findWord(parts[i], words.root);
+						if(s != null){
+							w.synonyms.addLast(s);
+							numSynonyms++;
+						}
+					}
+				}
+				linesRead++;
+			}
+			System.out.println("Done.\nThesaurus done. Found " + numSynonyms + " for " + found + " words.");
+			reader.close();
+		} catch (IOException x) {
+			System.err.format("IOException: %s\n", x);
+		}
+
 	}
 
 
@@ -259,7 +312,6 @@ public class Moby {
 		}
 		return "Amoeba";	// Failsafe word
 	}
-
 
 	/*
 	 * Searches a binary tree of MobyWords for one containing string s

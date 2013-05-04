@@ -50,7 +50,8 @@ public class Poet {
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
 		//moby.printAllWords();
-		System.out.println(writeHaiku("No leaf beside a tree\nregrets the tree it left. \nNever look back."));
+		//System.out.println(writeHaiku("No leaf beside a tree\nregrets the tree it left. \nNever look back."));
+		moby.setSynonyms("mobythes.aur");
 	}// hello
 	
 	
@@ -267,7 +268,7 @@ public class Poet {
 		int ls3 = tok3.countTokens();
 		*/
 		
-		syllableWorker j = new syllableWorker("SyllablesP1.txt");
+		SyllableWorker j = new SyllableWorker("SyllablesP1.txt");
 				
 		while(tok1.hasMoreTokens())
 		{
