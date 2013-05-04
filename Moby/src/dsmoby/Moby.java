@@ -170,7 +170,7 @@ public class Moby {
 				else if(parts[1].charAt(0) == 'A'){		// Adjective / Adverb Form
 					w = findWordPOS(wordbase, words.root, "Av");
 					if(w == null) continue;
-					System.out.println(line);
+					//System.out.println(line);
 					int adPartsStart = line.indexOf(":") + 1;
 					String adLine = line.substring(adPartsStart);
 					String[] adParts = adLine.split("\\|");
