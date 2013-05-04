@@ -40,6 +40,7 @@ public class GraceGrammar{
 	public String makeSentence(){
 		stack.addLast("S");
 		String sentence = "";
+		String pMark = moby.punctuation();
 
 		while(stack.count != 0){
 			//stack.printList();		//debugging stack
@@ -210,10 +211,10 @@ public class GraceGrammar{
 
 			// Otherwise we have a terminal, which we prepend to the sentence
 			else {
-				sentence = top + " " + sentence;
+				sentence = " " + top + sentence;
 			}
 		}
-		return sentence;
+		return sentence + pMark;
 	}
 
 

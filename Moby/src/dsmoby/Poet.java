@@ -53,7 +53,7 @@ public class Poet {
 		//moby.printAllWords();
 		//moby.printAllVerbs();
 		//moby.shiftChoose();
-		String freeVerse = writeFreeVerseVerbs(5);
+		String freeVerse = writeFreeVerseVerbs(3);
 		System.out.println(freeVerse);
 		
 		

@@ -688,6 +688,14 @@ public class Moby {
 		
 	}
 	
+	public String punctuation(){
+		Random rand = new Random();
+		String[] tenseList = {".", "!", "?", "..."};
+		String pMark = tenseList[rand.nextInt(tenseList.length)];
+		return pMark;
+		
+	}
+	
   
 }
 		
