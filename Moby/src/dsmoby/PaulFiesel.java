@@ -2,7 +2,7 @@ package dsmoby;
 
 public class PaulFiesel {	
 	private static Moby moby = null;
-	
+
 	public static void main(String[] args) {
 		moby = new Moby("cmupronRand.txt", 
 				"mpos.txt",
@@ -16,22 +16,20 @@ public class PaulFiesel {
 		String newSentence = makeNewSentence(newPhoneString);
 		System.out.println(newSentence);
 	}
-	
+
 	/*
 	 * Takes a long string of phones and changes them
 	 * one-by-one into a similar-sounding string of phones.
 	 */
 	private static String changeAllPhones(String s){
 		String returnString = "";
-		
-		// For loop here changing the phones one at a time
-		String newPhone = "";
-		returnString = returnString + newPhone;
-		
-		
+		for(int i = 0; i < s.length(); i += 2){
+			// For loop here changing the phones one at a time
+			returnString += changeOnePhone(s.substring(i,i+2));
+		}
 		return returnString;
 	}
-	
+
 	/*
 	 * Takes as input a long string of phones
 	 * Produces a sentence using those phones.
@@ -39,277 +37,234 @@ public class PaulFiesel {
 	private static String makeNewSentence(String s){
 		return "";
 	}
-	
+
 	/*
 	 * Takes a 2-character phone string as input and
 	 * returns a similar-sounding 2-character phone string.
 	 */
 	private static String changeOnePhone(String p){
-		if (p.compareTo("S )") == 0){
+		if (p.compareTo("S ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "S ";
+			if (x < .50){
+				p = "Z ";
 			}
-			else if (x < .66){
+			else if (x < .50){
 				p = "SH";
-			}
-			else{
-				p = "B ";
 			}
 			return p;
 		}
-		if (p.compareTo("B )") == 0){
+		if (p.compareTo("B ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "T ";
-			}
-			else if (x < .66){
+			if (x < .50){
 				p = "P ";
 			}
 			else{
-				p = "Z ";
+				p = "D ";
 			}
+			return p;
 		}
-		if (p.compareTo("CH)") == 0){
+		if (p.compareTo("CH") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "N ";
+			if (x < .50){
+				p = "TH";
 			}
-			else if (x < .66){
+			else{
 				p = "SH";
 			}
-			else{
-				p = "M ";
-			}
+			return p;
 		}
-		if (p.compareTo("D )") == 0){
+		if (p.compareTo("D ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "B ";
-			}
-			else if (x < .66){
-				p = "T ";
-			}
-			else{
-				p = "G ";
-			}
-		}
-		if (p.compareTo("DH)") == 0){
-			double x = Math.random();
-			if (x < .33){
-				p = "R ";
-			}
-			else if (x < .66){
-				p = "N ";
+			if (x < .50){
+				p = "P ";
 			}
 			else{
 				p = "K ";
 			}
+			return p;
 		}
-		if (p.compareTo("F )")== 0){
+		if (p.compareTo("DH") == 0){
 			double x = Math.random();
-			if (x < .33){
+			if (x < .50){
 				p = "B ";
 			}
-			else if (x < .66){
+			else{
+				p = "T ";
+			}
+			return p;
+		}
+		if (p.compareTo("F ")== 0){
+			double x = Math.random();
+			if (x < .50){
+				p = "P ";
+			}
+			else{
 				p = "D ";
+			}
+			return p;
+		}
+		if (p.compareTo("G ") == 0){
+			double x = Math.random();
+			if (x < .50){
+				p = "K ";
 			}
 			else{
 				p = "CH";
 			}
+			return p;
 		}
-		if (p.compareTo("G )") == 0){
+		if (p.compareTo("HH") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "M ";
-			}
-			else if (x < .66){
-				p = "Z ";
+			if (x < .50){
+				p = "SH";
 			}
 			else{
-				p = "DH";
+				p = "CH";
 			}
+			return p;
 		}
-		if (p.compareTo("HH)") == 0){
+		if (p.compareTo("K ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "R ";
-			}
-			else if (x < .66){
-				p = "W ";
+			if (x < .50){
+				p = "G ";
 			}
 			else{
-				p = "K ";
+				p = "N ";
 			}
+			return p;
 		}
-		if (p.compareTo("K )") == 0){
+		if (p.compareTo("L ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "HH";
-			}
-			else if (x < .66){
-				p = "W ";
+			if (x < .50){
+				p = "P ";
 			}
 			else{
 				p = "Y ";
 			}
+			return p;
 		}
-		if (p.compareTo("L )") == 0){
+		if (p.compareTo("M ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "P ";
-			}
-			else if (x < .66){
-				p = "SH";
-			}
-			else{
-				p = "DH";
-			}
-		}
-		if (p.compareTo("M )") == 0){
-			double x = Math.random();
-			if (x < .33){
+			if (x < .50){
 				p = "S ";
 			}
-			else if (x < .66){
+			else{
 				p = "N ";
 			}
-			else{
-				p = "R ";
-			}
+			return p;
 		}
-		if (p.compareTo("N )") == 0){
+		if (p.compareTo("N ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "W ";
-			}
-			else if (x < .66){
-				p = "L ";
+			if (x < .50){
+				p = "S ";
 			}
 			else{
-				p = "D ";
+				p = "M ";
 			}
+			return p;
 		}
-		if (p.compareTo("P )") == 0){
+		if (p.compareTo("P ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "G ";
-			}
-			else if (x < .66){
-				p = "L ";
-			}
-			else{
-				p = "P ";
-			}
-		}
-		if (p.compareTo("R )") == 0){
-			double x = Math.random();
-			if (x < .33){
-				p = "D ";
-			}
-			else if (x < .66){
+			if (x < .50){
 				p = "F ";
 			}
 			else{
-				p = "V ";
+				p = "T ";
 			}
+			return p;
 		}
-		if (p.compareTo("S )") == 0){
+		if (p.compareTo("R ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "G ";
+			if (x < .50){
+				p = "P ";
 			}
-			else if (x < .66){
-				p = "V ";
+			else{
+				p = "M ";
+			}
+
+			return p;
+		}
+		if (p.compareTo("S ") == 0){
+			double x = Math.random();
+			if (x < .50){
+				p = "SH";
+			}
+			else{
+				p = "Z ";
+			}
+			return p;
+		}
+		if (p.compareTo("SH") == 0){
+			double x = Math.random();
+			if (x < .50){
+				p = "S ";
 			}
 			else{
 				p = "TH";
 			}
+			return p;
 		}
-		if (p.compareTo("SH)") == 0){
+		if (p.compareTo("T ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "DH";
-			}
-			else if (x < .66){
-				p = "B ";
-			}
-			else{
-				p = "M ";
-			}
-		}
-		if (p.compareTo("T )") == 0){
-			double x = Math.random();
-			if (x < .33){
+			if (x < .50){
 				p = "K ";
 			}
-			else if (x < .66){
-				p = "M ";
-			}
 			else{
-				p = "F ";
+				p = "P ";
 			}
+			return p;
 		}
-		if (p.compareTo("TH)") == 0){
+		if (p.compareTo("TH") == 0){
 			double x = Math.random();
-			if (x < .33){
+			if (x < .50){
 				p = "SH";
 			}
-			else if (x < .66){
-				p = "L ";
-			}
 			else{
-				p = "V ";
+				p = "T ";
 			}
+			return p;
 		}
 		if (p.compareTo("V ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "Z ";
-			}
-			else if (x < .66){
+			if (x < .50){
 				p = "F ";
 			}
 			else{
-				p = "D ";
+				p = "W ";
 			}
+			return p;
 		}
 		if (p.compareTo("W ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "HH";
-			}
-			else if (x < .66){
-				p = "N ";
+			if (x < .50){
+				p = "V ";
 			}
 			else{
-				p = "K ";
+				p = "M ";
 			}
+			return p;
 		}
 		if (p.compareTo("Y ") == 0){
 			double x = Math.random();
-			if (x < .33){
+			if (x < .50){
 				p = "V ";
 			}
-			else if (x < .66){
+			else{
 				p = "W ";
 			}
-			else{
-				p = "L ";
-			}
+
+			return p;
 		}
 		if (p.compareTo("Z ") == 0){
 			double x = Math.random();
-			if (x < .33){
-				p = "K ";
-			}
-			else if (x < .66){
-				p = "N ";
+			if (x < .50){
+				p = "SH";
 			}
 			else{
 				p = "S ";
 			}
+			return p;
 		}
-		return "";	// XXX this is fake --- delete when all "returns" are in there.
+		return p;
 	}
 }
