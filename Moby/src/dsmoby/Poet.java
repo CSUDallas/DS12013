@@ -59,7 +59,6 @@ public class Poet {
 		String freeVerse = writeFreeVerseVerbs(3);
 		System.out.println(freeVerse);
 		
-		
 	}// hello
 	
 	
@@ -260,9 +259,8 @@ public class Poet {
 		
 		return dd;
 	}
-	
-	
 
+	
 	public static String writeHaiku(String haiku)
 	{
 		String Haiku = haiku;

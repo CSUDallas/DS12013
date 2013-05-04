@@ -181,8 +181,6 @@ public class Moby {
 				} 
 				else if(parts[1].charAt(0) == 'A'){		// Adjective / Adverb Form
 					w = findWordPOS(wordbase, words.root, "Av");
-					if(w == null) continue;
-					//System.out.println(line);
 					if(w == null){
 						linesRead++;
 						continue;
@@ -315,7 +313,6 @@ public class Moby {
 		}
 		return "Amoeba";	// Failsafe word
 	}
-
 	
 	
 	public String getVerbSimple(String tense){
@@ -324,7 +321,6 @@ public class Moby {
 		DSElement<MobyWord> w = wordsList.first;
 		for(int i = 0; i < start; i++)
 			w = w.getNext();
-
 		// From this point, find the first word (weakly)matching our stresses pattern
 		int count = wordsList.size();	// failsafe counter
 		while(count > 0){

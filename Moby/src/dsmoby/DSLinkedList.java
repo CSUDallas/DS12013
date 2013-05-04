@@ -1,6 +1,6 @@
 package dsmoby;
 
-public class DSLinkedList<E extends Comparable> {
+public class DSLinkedList<E extends Comparable<E>> {
 	public DSElement<E> first;
 	public DSElement<E> last;
 	public int count;
