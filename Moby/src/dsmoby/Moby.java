@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Random;
 
 public class Moby {
 	DSBinaryTree<MobyWord> words;
@@ -170,7 +171,7 @@ public class Moby {
 				else if(parts[1].charAt(0) == 'A'){		// Adjective / Adverb Form
 					w = findWordPOS(wordbase, words.root, "Av");
 					if(w == null) continue;
-					System.out.println(line);
+					//System.out.println(line);
 					int adPartsStart = line.indexOf(":") + 1;
 					String adLine = line.substring(adPartsStart);
 					String[] adParts = adLine.split("\\|");
@@ -260,7 +261,306 @@ public class Moby {
 		return "Amoeba";	// Failsafe word
 	}
 
+	
+	
+	public String getVerbSimple(String tense){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
 
+		// From this point, find the first word (weakly)matching our stresses pattern
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().isPos("V"))
+				if(tense == "PSVerb")
+					return w.getItem().sForm;
+				else if(tense == "PPVerb")
+					return w.getItem().word;
+				else if(tense == "FSVerb")
+					return "will " + w.getItem().sForm;
+				else if(tense == "FPVerb")
+					return "will " + w.getItem().word;
+				else if(tense == "PastVerb")
+					return w.getItem().pastForm;
+				else if(tense == "PrPVerb")
+					return "have " + w.getItem().pastForm;
+				else if(tense == "PaPVerb")
+					return "had " + w.getItem().pastForm;
+				else if(tense == "FuPVerb")
+					return "will have " + w.getItem().pastForm;
+				else if(tense == "PaPerProVerb")
+					return "had been " + w.getItem().ingForm;
+				else if(tense == "FuPerProVerb")
+					return "will have been " + w.getItem().ingForm;
+				else 
+					return "Amoeba";
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "Amoeba";	// Failsafe word
+	}
+	
+	
+	/*
+	 * return present tense verb with singular (not "I") subject
+	 */
+	public String getPSVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return w.getItem().sForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "Amoebas";	// Failsafe word
+
+	}
+	
+	public String getPSVerbSimple(String pos){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().isPos("V"))
+				return w.getItem().sForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "Amoeba";	// Failsafe word
+
+	}
+
+	/*
+	 * return present tense verb with plural subject
+	 */
+	public String getPPVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return w.getItem().word;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "amoeba";	// Failsafe word
+
+	}
+
+	/*
+	 * return future tense verb
+	 */
+	public String getFVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "will " + w.getItem().word;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "will amoeba";	// Failsafe word
+
+	}	
+
+	/*
+	 * return past tense verb
+	 */
+	public String getPastVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return w.getItem().pastForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "Amoeba'd";	// Failsafe word
+
+	}
+
+	/*
+	 * return present perfect verb
+	 */
+	public String getPrPVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "have " + w.getItem().pastForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "have amoeba'd";	// Failsafe word
+
+	}
+
+	/*
+	 * return past perfect verb
+	 */
+	public String getPaPVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "had " + w.getItem().pastForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "had amoeba'd";	// Failsafe word
+
+	}
+
+	/*
+	 * return future perfect verb
+	 */
+	public String getFuPVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "will have " + w.getItem().pastForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "will have amoeba'd";	// Failsafe word
+
+	}
+
+	/*
+	 * return past perfect progressive verb
+	 */
+	public String getPaPerProVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "had been " + w.getItem().ingForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "had been amoeba-ing";	// Failsafe word
+
+	}
+
+	/*
+	 * return future perfect progressive verb
+	 */
+	public String getFuPerProVerb(String pos, String stresses, String rhyme, boolean exact){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * wordsList.size());
+		DSElement<MobyWord> w = wordsList.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// adapt wordfinder above to just find verb
+		int count = wordsList.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos("V") && w.getItem().rhymesWith(rhyme))
+				return "will have been " + w.getItem().ingForm;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		return "will have been amoeba-ing";	// Failsafe word
+
+	}
+
+	
 	/*
 	 * Searches a binary tree of MobyWords for one containing string s
 	 * beginning its search at node "start"
@@ -368,4 +668,29 @@ public class Moby {
 			w.print();
 		}
 	}
+	
+	public void printAllVerbs(){
+		for(MobyWord w : words.sortedArray()){
+			if(w.word.compareToIgnoreCase("collect") == 0)
+				w.pastForm = w.pastForm;
+			w.printIfVerb();
+		}
+	}
+	
+	public void shiftChoose(){
+		Random rand = new Random();
+		String[] tenseList = {"PSVerb", "PPVerb", "FSVerb", "FPVerb", "PastVerb", 
+							  "PrPVerb", "PaPVerb", "FuPVerb", "PaPerProVerb", "FuPerProVerb"};
+		String a = tenseList[rand.nextInt(tenseList.length)];
+		String b = tenseList[rand.nextInt(tenseList.length)];
+		System.out.println(a);
+		System.out.println(b);
+		
+	}
+	
+  
 }
+		
+	
+
+

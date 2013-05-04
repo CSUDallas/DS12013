@@ -140,6 +140,10 @@ public class MobyWord implements Comparable<MobyWord> {
 		isIndefArticle 	= p.contains("I");
 		isNominative 	= p.contains("o");
 	}
+	
+//	public void setTenseString(String t){
+//		
+//	}
 
 	public int compareTo(MobyWord w){
 		return word.compareToIgnoreCase(w.word);
@@ -240,4 +244,50 @@ public class MobyWord implements Comparable<MobyWord> {
 		System.out.println("isNominative = " + isNominative);
 		System.out.println("");
 	}
+	
+	public void printIfVerb(){
+		if(!this.isVerb)
+			return;
+		System.out.println("word = " + word);
+		System.out.println("singularForm = " + singularForm);
+		System.out.println("pluralForm = " + pluralForm);
+		System.out.println("baseVerbForm = " + baseVerbForm);
+		System.out.println("pastForm = " + pastForm);
+		System.out.println("pastParticipleForm = " + pastParticipleForm);
+		System.out.println("ingForm = " + ingForm);
+		System.out.println("sForm = " + sForm);
+		System.out.println("baseAd = " + baseAd);
+		System.out.println("comparativeForm = " + comparativeForm);
+		System.out.println("superlativeForm = " + superlativeForm);
+		System.out.println("numStrings = " + numStrings);
+		System.out.println("scowlValue = " + scowlValue);
+		System.out.println("phoneString = " + phoneString);
+		System.out.println("stressString = " + stressString);
+		System.out.println("posString = " + posString);
+		System.out.println("isProper = " + isProper);
+		System.out.println("isNoun = " + isNoun);
+		System.out.println("isPlural = " + isPlural);
+		System.out.println("isNounPhrase = " + isNounPhrase);
+		System.out.println("isVerb = " + isVerb);
+		System.out.println("isVerbT = " + isVerbT);
+		System.out.println("isVerbI = " + isVerbI);
+		System.out.println("isPastTense = " + isPastTense);
+		System.out.println("isPastParticiple = " + isPastParticiple);
+		System.out.println("isIngForm = " + isIngForm);
+		System.out.println("isSForm = " + isSForm);
+		System.out.println("isAdjective = " + isAdjective);
+		System.out.println("isComparative = " + isComparative);
+		System.out.println("isSuperlative = " + isSuperlative);
+		System.out.println("isAdverb = " + isAdverb);
+		System.out.println("isConjunction = " + isConjunction);
+		System.out.println("isPreposition = " + isPreposition);
+		System.out.println("isInterjection = " + isInterjection);
+		System.out.println("isPronoun = " + isPronoun);
+		System.out.println("isDefArticle = " + isDefArticle);
+		System.out.println("isIndefArticle = " + isIndefArticle);
+		System.out.println("isNominative = " + isNominative);
+		System.out.println("");
+	}
+
+
 }

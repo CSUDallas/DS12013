@@ -15,27 +15,37 @@ import java.util.Random;
 public class GraceGrammar{
 	DSLinkedList<String> stack;
 	Random gen;
+	private static Moby moby;
+	DSBinaryTree<MobyWord> words;
+	DSLinkedList<MobyWord> wordsList;
 	/*
 	 * Constructor
 	 */
-	
+
 	public GraceGrammar(){
 		stack = new DSLinkedList<String>();
 		gen = new Random();
+		//comment out corresponding lines in Poet, or else printout will duplicate
+		moby = new Moby("cmupronRand.txt", 
+				"mpos.txt",
+				"flist.txt",
+				"infl.txt");
+		moby.setScowlThreshold(60);
 	}
 
-	
+
 	/*
-	 * method to generate one random sentence
+	 * method to generate one sentence in the present tense
 	 */
 	public String makeSentence(){
 		stack.addLast("S");
 		String sentence = "";
 
 		while(stack.count != 0){
+			//stack.printList();		//debugging stack
 			String top = stack.removeLast();
 
-			// S   --> SUB PRED
+			// S --> SUB PRED
 			if(top.equals("S")){
 				stack.addLast("SUB");
 				stack.addLast("PRED");
@@ -55,10 +65,11 @@ public class GraceGrammar{
 				}
 			}
 
-			// N   --> "I" | "Grace" | "Cheese" | etc...
+			// N --> "I" | "Grace" | "Cheese" | etc...
 			else if(top.equals("N")){
 				//String n = nounList[gen.nextInt(nounList.length)];
-				stack.addLast("noun");
+				stack.addLast(moby.getWord("N", " ", "", false));
+				//stack.addLast("(noun)");
 			}
 
 
@@ -84,7 +95,8 @@ public class GraceGrammar{
 			// ADJ --> "good" | "bad" | "ugly"
 			else if(top.equals("ADJ")){
 				//String adj = adjectiveList[gen.nextInt(adjectiveList.length)];
-				stack.addLast("adjective");
+				stack.addLast(moby.getWord("A", " ", "", false));
+				//stack.addLast("adj");
 			}
 
 			// PP --> P ART N
@@ -97,13 +109,24 @@ public class GraceGrammar{
 			// P --> "of" | "in" | etc...
 			else if(top.equals("P")){
 				//String p = prepositionList[gen.nextInt(prepositionList.length)];
-				stack.addLast("preposition");
+				stack.addLast(moby.getWord("P", " ", "", false));
+				//stack.addLast("prep");
 			}
 
 			// ART --> "a" | "an" | "the"
 			else if(top.equals("ART")){
 				//String art = articleList[gen.nextInt(articleList.length)];
-				stack.addLast("article");
+				switch(gen.nextInt(2)){
+				case 0:
+					stack.addLast(moby.getWord("D", " ", "", false));
+					//stack.addLast("DefArt");
+					break;
+				case 2:
+					stack.addLast(moby.getWord("I", " ", "", false));
+					//stack.addLast("InDefArt");
+					break;
+				}
+
 			}
 
 			// PRED --> VP | V OBJ
@@ -144,13 +167,44 @@ public class GraceGrammar{
 			// V --> "likes" | "eats" | "runs" | etc...
 			else if(top.equals("V")){
 				//String v = verbList[gen.nextInt(verbList.length)];
-				stack.addLast("verb");
+				switch(gen.nextInt(9)){
+				case 0:
+					stack.addLast(moby.getPSVerb("V", " ", "", false));	//Present tense singular
+					break;
+				case 1:
+					stack.addLast(moby.getPPVerb("V", " ", "", false));	//present tense plural
+					break;
+				case 2:
+					stack.addLast(moby.getFVerb("V", " ", "", false));	//future tense
+					break;
+				case 3:
+					stack.addLast(moby.getPastVerb("V", " ", "", false));	//past tense
+					break;
+				case 4:
+					stack.addLast(moby.getPrPVerb("V", " ", "", false));	//present perfect tense
+					break;
+				case 5:
+					stack.addLast(moby.getPaPVerb("V", " ", "", false));	//past perfect tense
+					break;
+				case 6:
+					stack.addLast(moby.getFuPVerb("V", " ", "", false));	//future perfect tense
+					break;
+				case 7:
+					stack.addLast(moby.getPaPerProVerb("V", " ", "", false));	//past perfect progressive tense
+					break;
+				case 8:
+					stack.addLast(moby.getFuPerProVerb("V", " ", "", false));	//future perfect progressive tense
+					break;
+
+
+				}
 			}
 
 			// ADV --> ADV | ADV | ADV | etc...
 			else if(top.equals("ADV")){
 				//String adv = adverbList[gen.nextInt(adverbList.length)];
-				stack.addLast("adverb");
+				stack.addLast(moby.getWord("v", " ", "", false));
+				//stack.addLast("adv");
 			}
 
 
@@ -160,31 +214,51 @@ public class GraceGrammar{
 			}
 		}
 		return sentence;
-	}    
-}
-/*
-  A VERY SIMPLE GRAMMAR
-  =====================
-  Variables:
-  S = "Sentence" = "Start"
-  SUB = "Subject"
-  PRED = "Predicate"
-  NP = "Noun Phrase"
-  N = "Noun"
-  PP = "Prepositional Phrase"
-  P = "Preposition"
+	}
 
-  Rules:
-  SENT   --> SUB PRED
-  SUB --> NP | NP "and" SUB
-  N   --> "I" | "Grace" | "Cheese" | etc...
-  NP --> ART ADJ N | ART N | NP PP
-  ADJ --> "good" | "bad" | "ugly"
-  PP --> P ART N
-  P --> "of" | "in" | etc...
-  ART --> "a" | "an" | "the"
-  PRED --> VP | V OBJ
-  VP --> V | V OBJ | ADV VP
-  OBJ --> NP
-  V --> "likes" | "eats" | "runs" | etc...
+
+
+}
+
+
+/*
+A NOT-SO-SIMPLE-GRAMMAR
+=====================
+Variables:
+S = "Sentence" = "Start"
+SUB = "Subject"
+PRED = "Predicate"
+NP = "Noun Phrase"
+N = "Noun"
+PP = "Prepositional Phrase"
+P = "Preposition"
+PSVerb = present tense, singular subject. .sForm
+PPVerb = present tense, plural subject. word
+FSVerb = future tense, singular subject. "will" + .sForm
+FPVerb = future tense, plural subject. "will" + word
+PastVerb = past tense. .pastForm
+PrPVerb = present perfect tense. "have" + .pastForm
+PaPVerb = past perfect tense. "had" + .pastForm
+FuPVerb = future perfect tense. "will have" + .pastForm
+present progressive will prob. be hard coded or implemented later
+PaPerProVerb = past perfect progressive tense. "had been" + .ingForm
+FuPerProVerb = future perfect progressive tense. "will have been" + .ingForm
+
+
+Rules:
+SENT --> SUB PRED
+SUB --> NP | NP "and" SUB
+N --> "I" | "Grace" | "Cheese" | etc...
+NP --> ART ADJ N | ART N | NP PP
+ADJ --> "good" | "bad" | "ugly"
+PP --> P ART N
+P --> "of" | "in" | etc...
+ART --> "a" | "an" | "the"
+PRED --> VP | V OBJ
+VP --> V | V OBJ | ADV VP
+OBJ --> NP
+V --> "likes" | "eats" | "runs" | etc...
+
+
+
  */
