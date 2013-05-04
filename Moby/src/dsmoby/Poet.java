@@ -33,16 +33,20 @@ import java.util.*;
 //look i added something very special, more special than you can imagine
 public class Poet {
 	private static Moby moby;
+	private static GraceGrammar grammar;
 	
 	// This is a wonderful comment!
 	
 	public static void main(String[] args){
-		moby = new Moby("cmupronRand.txt", 
-				"mpos.txt",
-				"flist.txt",
-				"infl.txt");
-		moby.setScowlThreshold(60);
+		//comment out next 5 lines when using GraceGrammar to avoid duplicate printouts
+//		moby = new Moby("cmupronRand.txt", 
+//				"mpos.txt",
+//				"flist.txt",
+//				"infl.txt");
+//		moby.setScowlThreshold(60);
 		
+		grammar = new GraceGrammar();
+		//System.out.println(grammar.makeSentence());
 		//String poem = writeIambicPoemRhyme(5, 14);	// Sonnet
 		//String poem = writeDoubleDactyl();
 		//System.out.println(poem);
@@ -50,10 +54,23 @@ public class Poet {
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
 		//moby.printAllWords();
-		//System.out.println(writeHaiku("No leaf beside a tree\nregrets the tree it left. \nNever look back."));
-		moby.setSynonyms("mobythes.aur");
+		//moby.printAllVerbs();
+		//moby.shiftChoose();
+		String freeVerse = writeFreeVerseVerbs(3);
+		System.out.println(freeVerse);
+		
 	}// hello
 	
+	
+	//writes a specified number of sentences containing conjugated verbs
+	//"free verse" is poetry that has neither rhyme nor meter
+	public static String writeFreeVerseVerbs(int lines){
+		String freeVerse = "";
+		for(int i = 0; i < lines; i++)
+			freeVerse = freeVerse + grammar.makeSentence() + "\n";
+		return freeVerse;
+		
+	}
 	
 	public static String writeIambicPoemDumb(int iambs, int lines){
 		String poem = "";
@@ -243,6 +260,7 @@ public class Poet {
 		return dd;
 	}
 
+	
 	public static String writeHaiku(String haiku)
 	{
 		String Haiku = haiku;
