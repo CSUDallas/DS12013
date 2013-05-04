@@ -1,39 +1,52 @@
 package latina;
-
+/*
+ * ServumVerbi is a server of Verba - it reads three files, a dictionary, inflects (endings), and a macron dictionary
+ * This class also contains all methods to get Verba and Termini
+ * Macrons are also processed here
+ */
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ServumVerbi {
-	DSLinkedList<Verbum> words; 
-	//DSBinaryTree<Verbum> wordTree; 
-	DSLinkedList<Terminus> inflects; 
+	public DSLinkedList<Verbum> tempWords; 
+	public DSBinaryTree<Verbum> wordTree; 
+	public DSLinkedList<Verbum> words;
+	public DSLinkedList<Terminus> inflects; 
 	int ft = 0, nft = 0;
+	private Calendar rightNow;
 
 	public ServumVerbi(String dict, String flec, String macron) {
+		//Starts a counter to get time elapsed for reading files
+		rightNow = Calendar.getInstance();
+		int startMin = rightNow.get(rightNow.MINUTE);
+		int startSec = rightNow.get(rightNow.SECOND);
+		//Initialize words DSLinkedList
+		words = new DSLinkedList<Verbum>();
 
-		// First we read the DICTLINE.GEN file, preferably randomized first
+		// First we read the DICTLINE.GEN / DICTLINERAND.GEN file, preferably randomized first
 		try { 
 			FileReader f = new FileReader(dict);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
-			words = new DSLinkedList<Verbum>();
-			//wordTree = new DSBinaryTree<Verbum>();
+			tempWords = new DSLinkedList<Verbum>();
+			wordTree = new DSBinaryTree<Verbum>();
 			while ((line = reader.readLine()) != null) {
 				Verbum v = new Verbum();
 				v.setLine(line);
-				words.addFirst(v);
-				//wordTree.insert(v);
+				tempWords.addFirst(v);
+				wordTree.insert(v);
 			}
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
-		System.out.println("Done reading " + dict + " file");
-		System.out.println("Verbum tree has " + words.count + 
-				" words and height ");// + words.maxDepth());
-		//words.root.getItem().print();
+		System.out.println("+ Done reading " + dict + " file");
+		System.out.println("   Verbum tree has " + wordTree.count + 
+				" words and height " + wordTree.maxDepth());
 
 		// Now we read the INFLECTS.LAT file
 		try { 
@@ -49,24 +62,21 @@ public class ServumVerbi {
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
-		System.out.println("Done reading " + flec + " file");
-		System.out.println("Termini tree has " + inflects.count + 
-				" endings and height ");// + inflects.maxDepth());
-		//System.out.println(inflects.root.getItem().ending);
-		//inflects.root.getItem().print();
-		//inflects.first.getNext().getItem().print();
+		System.out.println("+ Done reading " + flec + " file");
+		System.out.println("   Termini tree has " + inflects.count + " endings"); // and height " + inflects.maxDepth()); - if it were a tree
 
-		// Set the nominative form
-		testGetNom();
-		
-		// Now we read the macron file
+		// Set the nominative form of all Verba
+		setNoms();
+		System.out.println("+ Verba nominatized");
+
+		// Now we read the macron file LatinMacronFile.xml
 		int numFound = 0, numNotFound = 0;
 		try { 
 			FileReader f = new FileReader(macron);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
 			String bothPattern = "entry.*key=\"([a-zA-Z]*).*<orth.*>\\p{P}*(\\p{L}+).*</orth>";
-	        Pattern bp = Pattern.compile(bothPattern);
+			Pattern bp = Pattern.compile(bothPattern);
 			String keyMatch = "", orthMatch = "";
 			String workingLine = "";
 			while ((line = reader.readLine()) != null) {
@@ -82,17 +92,31 @@ public class ServumVerbi {
 						numFound++;	
 					else
 						numNotFound++;
-		        	workingLine = "";
+					workingLine = "";
 				}
 			}
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
-		System.out.println("Done reading " + macron + " file");
-		System.out.println("Found " + numFound + ", failed to find: " + numNotFound);
+		System.out.println("+ Done reading " + macron + " file");
+		System.out.println("   Found " + numFound + ", failed to find " + numNotFound);
+
+		// Delete the nominative ending from the macrons string
+		// Put macrons ("*") in forms
+		doMacrons();
+		System.out.println("+ Verba macronized");
+		System.out.println("++ Total Verba available: " + words.count);
+
+		//Get current time and calculate the time elapsed for reading files
+		rightNow = Calendar.getInstance();
+		int endMin = rightNow.get(rightNow.MINUTE);
+		int endSec = rightNow.get(rightNow.SECOND);
+		int time = (endMin-startMin)*60 + endSec-startSec;
+		System.out.println("Time elapsed (sec): " + time);
 	}
-	
-	
+
+	//-----Methods to handle macrons-----//
+	//NOTE: A macron is represented by an astrisk
 	/*
 	 * Forms the asterisked version of the orth string.
 	 * Searches for a Verbum whose nominative form equals the key.
@@ -111,9 +135,12 @@ public class ServumVerbi {
 				macronForm = macronForm + key.charAt(i);
 		}
 		//System.out.println(key + ", " + orth + ", " + macronForm);
-		Verbum v = findWordByNomForm(key);
+		Verbum v = findWordByNomForm(key, wordTree.root); //Found 8367, failed to find: 9214 - Sec. 8
+		// --- Use below with Linked List
+		//Verbum v = findWordByNomForm(key); //Found 13620, failed to find: 3961 - SEc. 20
 		if(v != null){
 			v.macrons = macronForm;
+			words.addLast(v);
 			return true;
 		}
 		else{
@@ -121,13 +148,23 @@ public class ServumVerbi {
 			return false;
 		}
 	}
-	
-	/*
-	 * Searches the words list for a Verbum whose nom field equals nomForm
-	 * XXX This would go quicker if we were in a binary tree...
-	 */
-	private Verbum findWordByNomForm(String nomForm){
+	//Method to print several outputs for debugging
+	public void testMacronProcess(){
 		DSElement<Verbum> e = words.first;
+		for(int i = 0; i<1000; i++){
+			Verbum v = e.getItem();
+			System.out.println(v.nom + " " + v.macrons + " " + v.form1);
+			e = e.getNext();
+		}
+	}
+	/*
+	 * XXX Deprecated method, use findWordByNomForm(String nomForm, DSElement<Verbum> start)
+	 * Searches the words list for a Verbum whose nom field equals nomForm
+	 * Uses the linked list for searching
+	 * XXX This would go quicker if we were in a binary tree... but we seem to lose some
+	 */
+	public Verbum findWordByNomForm(String nomForm){
+		DSElement<Verbum> e = tempWords.first;
 		while(e != null){
 			if(e.getItem().nom.equals(nomForm))
 				return e.getItem();
@@ -136,16 +173,140 @@ public class ServumVerbi {
 		}
 		return null;
 	}
-
+	/*
+	 * Searches the words list for a Verbum whose nom field equals nomForm
+	 * Uses the binary tree for searching
+	 */
+	private Verbum findWordByNomForm(String nomForm, DSElement<Verbum> start){
+		if(start == null)
+			return null;		
+		int cmp = start.getItem().nom.compareToIgnoreCase(nomForm);
+		if(cmp == 0){
+			return start.getItem();
+		}
+		if(cmp < 0)
+			return findWordByNomForm(nomForm, start.getRight());
+		if(cmp > 0)
+			return findWordByNomForm(nomForm, start.getLeft());
+		return null;
+	}
+	/*
+	 * Runs delNomFromMac(Verbum w) on each Verbum
+	 * Then adds macrons to form1, form2, form3, form4
+	 */
+	public void doMacrons(){
+		DSElement<Verbum> w = words.first;
+		int count = words.size();    // failsafe counter
+		while(count > 0){
+			//Make sure word hasn't been macroned before
+			if(w.getItem().macForm.isEmpty()){
+				//delete nom endings
+				delNomFromMac(w.getItem());
+				//insert macrons into forms
+				macsToForms(w.getItem());
+				//System.out.println(w.getItem().macForm);
+				//Insert special macrons into verbs
+				if(w.getItem().pos.equals("V")){
+					specialMacs(w.getItem());
+					//System.out.println(w.getItem().form3 + " " + w.getItem().form4);
+				}
+			}
+			w = w.getNext();
+			if(w == null)
+				w = words.first;
+			count--;
+		}
+	}
+	/*
+	 * Deletes the nominative endings from the macron strings and sets to macForm field
+	 */
+	public void delNomFromMac(Verbum w){
+		w.macForm = w.macrons.substring(0, w.macrons.length()-w.nomFormLengh);
+		if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+			w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+		}
+		return;
+	}
+	/*
+	 * Inserts macrons into the form1, form2, form3, form4 based on macrons in macForm
+	 */
+	public void macsToForms(Verbum w){
+		char[] letters = w.macForm.toCharArray();
+		ArrayList<Integer> indecies = new ArrayList<Integer>();
+		int c = 0;
+		for(int i = 0; i<letters.length; i++){ //Make into ints
+			if(letters[i]=='*'){
+				indecies.add(i);
+				c++;
+			}
+		}
+		c = 0;
+		for(int s : indecies){
+			w.form1 = new StringBuffer(w.form1).insert(s, "*").toString();
+			if(w.form2.length()>=findLargest(indecies)){
+				w.form2 = new StringBuffer(w.form2).insert(s, "*").toString();
+			}
+			if(w.form3.length()>=findLargest(indecies)){
+				w.form3 = new StringBuffer(w.form3).insert(s, "*").toString();
+			}
+			if(w.form4.length()>=findLargest(indecies)){
+				w.form4 = new StringBuffer(w.form4).insert(s, "*").toString();
+			}
+			c++;
+		}	
+	}
+	/*
+	 * Inserts macrons into special verbs which follow a pattern
+	 * E.g. 1 conj verbs have long a in 3rd and 4th pp
+	 */
+	public void specialMacs(Verbum w){
+		int conj = w.cd;
+		int variant = w.variant;
+		int i = 0;
+		int index = 0;
+		
+		if(conj==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
+			do {
+				char c = w.form3.charAt(i);
+				if(isVowel(c)){
+					index = i;
+				}
+				i++;
+			} while(i<w.form3.length()-1);
+			w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
+		}
+		if (conj==1 && variant==1){
+			w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
+			w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+		}
+	}
+	//Tests if char is vowel
+	public static boolean isVowel(char ch) {
+		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y';
+	}
+	//Calculates the syllable count
+	public int countSyllables(String s){
+		s = s.replace("qu", "q");
+		int i = 0;
+		int count = 0;
+		do {
+			char c = s.charAt(i);
+			if(isVowel(c)){
+				count++;
+			}
+			i++;
+		} while(i<s.length()-1);
+		return count;		
+	}
+	//-----END Macron Methods-----//
+	
 	public Verbum getWord(){
 		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * words.size());
-		DSElement<Verbum> w = words.first;
+		int start = (int)(Math.random() * tempWords.size());
+		DSElement<Verbum> w = tempWords.first;
 		for(int i = 0; i < start; i++)
 			w = w.getNext();
 		return w.getItem();
-		// From this point, find the first word (weakly)matching our stresses pattern
-
 	}
 
 	public Verbum getWord(String pos, char freqLevel){
@@ -185,8 +346,8 @@ public class ServumVerbi {
 
 	public Verbum getName(){
 		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * words.size());
-		DSElement<Verbum> w = words.first;
+		int start = (int)(Math.random() * tempWords.size());
+		DSElement<Verbum> w = tempWords.first;
 		for(int i = 0; i < start; i++)
 			w = w.getNext();
 		char freq;        
@@ -200,7 +361,7 @@ public class ServumVerbi {
 		 * F   only 1 citation - very rare
 		 */
 		// From this point, find the first word (weakly)matching our stresses pattern
-		int count = words.size();    // failsafe counter
+		int count = tempWords.size();    // failsafe counter
 		while(count > 0){
 			if(w.getItem().attribs.length()>3)
 				freq = w.getItem().attribs.charAt(3);
@@ -211,36 +372,37 @@ public class ServumVerbi {
 				return w.getItem();
 			w = w.getNext();
 			if(w == null)
-				w = words.first;
+				w = tempWords.first;
 			count--;
 		}
 		w.getItem().form1 = w.getItem().form1 + " BAD";
 		return w.getItem();    // Failsafe word
 	}
 
-	public void testGetNom(){
-		DSElement<Verbum> w = words.first;
-		int count = words.size();    // failsafe counter
+	public void setNoms(){
+		DSElement<Verbum> w = tempWords.first;
+		int count = tempWords.size();    // failsafe counter
 		while(count > 0){
-			w.setItem(vGetNom(w.getItem()));
+			GetNom(w.getItem());
+			//System.out.println(w.getItem().nom);
 			w = w.getNext();
 			if(w == null)
-				w = words.first;
+				w = tempWords.first;
 			count--;
 		}
-		
-		DSElement<Verbum> x = words.first;
+
+		/*DSElement<Verbum> x = words.first;
 		for(int i = 0; i<words.size(); i++){
 			Verbum v = x.getItem();
 			//if(v.pos.equals("ADV")){
 			System.out.println(v.pos + " " + v.cd + " " + v.variant + " " + v.nom);
-			
+
 			//}
 			x = x.getNext();
-		}
+		}*/
 	}
 
-	public Verbum vGetNom(Verbum w){
+	public void GetNom(Verbum w){
 		DSElement<Terminus> ending = inflects.first;
 		int variant = w.variant;
 		int variant2 = -2;
@@ -263,10 +425,12 @@ public class ServumVerbi {
 				//}
 				if(w.type.equals("DEP")){
 					w.nom = w.form1 + "or";
+					w.nomFormLengh = 3;
 				} else {
 					w.nom = w.form1 + "o";
+					w.nomFormLengh = 2;
 				}
-				return w;
+				return;
 			} else if(w.pos.equals("N") && end.pos.equals("N")) { //NOUN
 				/* Some special cases */
 				if(cd == 3 && variant == 1){ //Common lots of cases
@@ -279,7 +443,8 @@ public class ServumVerbi {
 				}
 				if(cd == 3) {
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 0;
+					return; //return nom. s. 3rd decl.
 				}
 				/* END */
 				if (end.wordcase != null && end.number != null){
@@ -288,73 +453,87 @@ public class ServumVerbi {
 							end.gender.equals(gender)) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						w.nomFormLengh = end.ending.length()+1;
+						return;
 					}
 					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
 							end.wordcase.equals("NOM") && end.number.equals("S") &&
 							end.gender.equals("X")) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						w.nomFormLengh = end.ending.length()+1;
+						return;
 					}
 					else if(end.cd == cd && (end.variant == variant || end.variant == variant2) && 
 							end.wordcase.equals("NOM") && end.number.equals("S") && 
 							end.gender.equals("C")) {
 						form = w.form1;
 						w.nom = form + end.ending;
-						return w;
+						w.nomFormLengh = end.ending.length()+1;
+						return;
 					}
 				}
 			} else if(w.pos.equals("ADJ") && end.pos.equals("ADJ")) {
 				/* Some special cases */
 				if(cd == 1 && (variant == 1 || variant == 3 || variant == 5)) {
 					w.nom = w.form1 + "us";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 1 && (variant == 2 || variant == 4)){ //Common lots of cases
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 0;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("COMP")) {
 					w.nom = w.form1 + "or";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("SUPER")) {
 					w.nom = w.form1 + "mus";
-					return w; //return nom. s. 3rd decl.
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 1) {
 					w.nom = w.form1 + "e";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 2;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 2) {
 					w.nom = w.form1 + "a";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 2;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 3) {
 					w.nom = w.form1 + "es";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && (variant == 6 || variant == 7)) {
 					w.nom = w.form1 + "os";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 2 && variant == 8) {
 					w.nom = w.form1 + "on";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 3 && (variant == 1 || variant == 3 || variant == 6)) {
 					w.nom = w.form1;
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 0;
+					return; //return nom. s. 3rd decl.
 				}
 				if(cd == 3 && variant == 2) {
 					w.nom = w.form1 + "is";
-					return w; //return nom. s. 3rd decl.
+					w.nomFormLengh = 3;
+					return; //return nom. s. 3rd decl.
 				}
 				/* END */				
 			} else if(w.pos.equals("ADV") && end.pos.equals("ADV")) {
 				w.nom = w.form1;
-				return w; //return nom. s. 3rd decl.
+				w.nomFormLengh = 0;
+				return; //return nom. s. 3rd decl.
 			}
 			ending = ending.getNext();
 			if(ending == null)
@@ -362,8 +541,20 @@ public class ServumVerbi {
 			count--;
 		}
 		w.nom = w.form1;
-		return w;
+		w.nomFormLengh = 0;
+		return;
 	}
+
+	public static int findLargest(ArrayList<Integer> numbers){  
+		int largest = numbers.get(0);  
+		for(int s : numbers){  
+			if(s > largest){  
+				largest = s;  
+			}  
+		}  
+		return largest;
+	}
+
 
 	public Verbum vGetTerminus(Verbum w, int p, String num, String tense, String voice, String mood){
 		int cd = w.cd;
@@ -418,7 +609,7 @@ public class ServumVerbi {
 				ending = inflects.first;
 			count--;
 		}
-		cw.item = w.form1+"MALUM";
+		cw.item = "";//w.form1+"MALUM";
 		return w;
 	}
 
@@ -471,6 +662,7 @@ public class ServumVerbi {
 							ending.getItem().gender.equals(gender)) {
 						w.cw.item = getForm(w, ending.getItem().form) + ending.getItem().ending;
 						w.cw.stem = getForm(w, ending.getItem().form);
+						w.cw.number = num;
 						w.cw.ending = ending.getItem().ending;
 						return w;
 					}
@@ -479,6 +671,7 @@ public class ServumVerbi {
 							ending.getItem().gender.equals("X")) {
 						w.cw.item = getForm(w, ending.getItem().form) + ending.getItem().ending;
 						w.cw.stem = getForm(w, ending.getItem().form);
+						w.cw.number = num;
 						w.cw.ending = ending.getItem().ending;
 						return w;
 					}
@@ -487,6 +680,7 @@ public class ServumVerbi {
 							ending.getItem().gender.equals("C")) {
 						w.cw.item = getForm(w, ending.getItem().form) + ending.getItem().ending;
 						w.cw.stem = getForm(w, ending.getItem().form);
+						w.cw.number = num;
 						w.cw.ending = ending.getItem().ending;
 						return w;
 					}
@@ -497,7 +691,8 @@ public class ServumVerbi {
 				ending = inflects.first;
 			count--;
 		}
-		cw.item = w.form1+"MALUM";
+		cw.item = "";//w.form1+"MALUM";
+		w.cw.number = num;
 		return w;
 	}
 
@@ -576,7 +771,7 @@ public class ServumVerbi {
 				ending = inflects.first;
 			count--;
 		}
-		cw.item = w.form1+"MALUM";
+		cw.item = "";//w.form1+"MALUM";
 		return w;
 	}
 

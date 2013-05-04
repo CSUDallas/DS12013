@@ -6,6 +6,7 @@ public class DSVertex implements Comparable<DSVertex>{
 	public boolean visited;
 	public int color;
 	public int distance;
+	public DSVertex parent;
 	/*
 	 * Constructs an unlabeled vertex
 	 */
@@ -19,6 +20,22 @@ public class DSVertex implements Comparable<DSVertex>{
 	public DSVertex(String l){
 		label = l;
 		neighbors = new DSLinkedList<DSVertex>();
+		visited=false;
+		distance=0;
+	}
+	
+	public boolean compareNeighborsColors(){
+		DSElement<DSVertex> e = neighbors.first;
+		while(e != null){
+			DSVertex w = e.getItem();
+			if(w.color == color)
+			{
+				return false;
+			}
+			e = e.getNext();
+		}
+		
+		return true;
 	}
 	
 	/*

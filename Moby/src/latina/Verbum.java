@@ -1,24 +1,29 @@
 package latina;
-
+/*
+ * Verbum holds a Latin word from the big dictionary file.
+ * It contains lots of information about it, such as the pp parts, forms, gender,
+ * declension, conjugation, macron form, nom, etc.
+ */
 public class Verbum implements Comparable<Verbum> {
 	public String form1;		// The (up to) four forms
 	public String form2;
 	public String form3;
 	public String form4;
 	public String pos;			// part of speech
-	public int cd;				// conjugation and declension?
+	public int cd;				// conjugation and declension
 	public int variant;	
 	public int value;			// for numbers
 	public String gender;		
-	public String degree;
-	public String mystery;	// reserved for future understanding
-	public String attribs;	// holds 5 characters
+	public String degree;		// for adjectives and adverbs
+	public String mystery;		// reserved for future understanding
+	public String attribs;		// holds 5 characters - frequency, etc.
 	public String definition;
-	public String type;		// for nouns and pronouns
-	public Unilogos cw; //complete word
-	
-	public String nom;
-	public String macrons;
+	public String type;			// for nouns and pronouns and verbs (DEP)
+	public Unilogos cw; 		// Unilogos - one instance of complete word - holds computed word and ending	
+	public String nom;			// computed nominative case
+	public String macrons;		// form with macrons
+	public String macForm;		// 'denominatized' macrons form
+	public int nomFormLengh;
 	
 	/*
 	 * Constructor
@@ -39,12 +44,14 @@ public class Verbum implements Comparable<Verbum> {
 		cw = new Unilogos();
 		nom = "";
 		macrons = "";
+		macForm = "";
+		nomFormLengh = -1;
 	}
 	
 	/*
 	 * After this object has been created, this method
 	 * can be used to set field values from a line of 
-	 * text from the file DICTLINE.GEN
+	 * text from the file DICTLINE.GEN / DICTLINERAND.GEN
 	 * Returns 0 on success, -1 on some error
 	 */
 	public int setLine(String s){
@@ -118,7 +125,7 @@ public class Verbum implements Comparable<Verbum> {
 				", Definition: " + definition);
 		System.out.println("--------------------------------------------");
 	}
-	
+	// Return a truncated definition of the Verbum
 	public String meaning(){
 		int c = definition.indexOf(",");
 		int s = definition.indexOf(";");
@@ -138,5 +145,4 @@ public class Verbum implements Comparable<Verbum> {
 			i = 25;
 		return definition.substring(0, i);	
 	}
-	
 }

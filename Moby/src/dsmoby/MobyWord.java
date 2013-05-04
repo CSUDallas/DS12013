@@ -45,7 +45,7 @@ public class MobyWord implements Comparable<MobyWord> {
 	public boolean		isIndefArticle;
 	public boolean		isNominative;
 
-	public DSLinkedList 	synonyms;
+	public DSLinkedList<MobyWord> 	synonyms;
 
 
 	public MobyWord(){
@@ -87,6 +87,7 @@ public class MobyWord implements Comparable<MobyWord> {
 		isDefArticle = false;
 		isIndefArticle = false;
 		isNominative = false;
+		synonyms = new DSLinkedList<MobyWord>();
 	}
 
 
@@ -141,9 +142,7 @@ public class MobyWord implements Comparable<MobyWord> {
 		isNominative 	= p.contains("o");
 	}
 	
-//	public void setTenseString(String t){
-//		
-//	}
+
 
 	public int compareTo(MobyWord w){
 		return word.compareToIgnoreCase(w.word);
