@@ -16,6 +16,26 @@ import java.util.Calendar;
           INTERJ,    --  INTERJection
           /
  */
+
+/*
+ * XXX
+ * XXX 
+ * XXX
+ * XXX 
+ * This file contains old methods and functionality that has been 
+ * updated in the Dactyl, Decline, and Conjugate classes
+ * ALL THINGS HERE ARE OLD VERSIONS
+ * and are NOT MEANT TO BE RUN
+ * TEST VERSIONS ONLY
+ * XXX
+ * XXX 
+ * XXX
+ * XXX 
+ */
+
+
+
+// * TEST VERSIONS ONLY *
 public class LatinPoet {
 	private static ServumVerbi sv;
 	private static int counter;
