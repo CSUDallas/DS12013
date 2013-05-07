@@ -1,3 +1,4 @@
+//Final uploaded 5/7/13
 package latina;
 /*
  * ServumVerbi is a server of Verba - it reads three files, a dictionary, inflects (endings), and a macron dictionary
