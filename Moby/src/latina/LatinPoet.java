@@ -42,6 +42,7 @@ public class LatinPoet {
 	private static int counter;
 	private static Calendar rightNow;
 	public static void main(String[] args) {
+		System.out.println("You are using LatinPoet.java to test methods, etc.");
 		sv = new ServumVerbi("DICTLINERAND.GEN",
 				"InflectsMacs.txt", "LatinMacronFile.xml");
 
