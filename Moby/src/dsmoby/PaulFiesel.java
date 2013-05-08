@@ -2,7 +2,7 @@ package dsmoby;
 
 public class PaulFiesel {	
 	private static Moby moby = null;
-
+	
 	public static void main(String[] args) {
 		moby = new Moby("cmupronRand.txt", 
 				"mpos.txt",
@@ -10,17 +10,18 @@ public class PaulFiesel {
 				"infl.txt");
 		moby.setScowlThreshold(60);
 
-		String sentence = "Basketball is a sport";
+		String sentence =  "I love to play basketball on hot days with the sun up high and my jeans down low.";
 		String phoneString = moby.getAllPhones(sentence);
 		String newPhoneString = changeAllPhones(phoneString);
-		//String newSentence = makeNewSentence(newPhoneString);
-		String w = moby.findWordWithPhones(newPhoneString);
-		while(w == null){
-			changeAllPhones(phoneString);
-			moby.findWordWithPhones(newPhoneString);
+		String newSentence = BuildNewSentence(newPhoneString);
+		while(newSentence == null){
+			newPhoneString = changeAllPhones(phoneString);
+			newSentence = BuildNewSentence(newPhoneString);
 		}
-		System.out.println(newPhoneString);
-		System.out.println(w);
+		//w.BuildNewSentence(___);
+		
+		//System.out.println(newPhoneString);
+		System.out.println(newSentence);
 	}
 
 	/*
@@ -36,6 +37,24 @@ public class PaulFiesel {
 		return returnString;
 	}
 
+	private static String BuildNewSentence(String ph){
+		String newph = "";
+		while(ph.length() > 0){
+			String w = moby.findWordWithPhones(ph);
+			
+			ph = ph.substring(moby.getAllPhones(w).length(), ph.length());
+			newph += w + " ";
+			
+			return newph;
+		}
+		return null;
+	}
+
+
+
+
+
+	
 	/*
 	 * Takes as input a long string of phones
 	 * Produces a sentence using those phones.
@@ -61,7 +80,7 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("B ") == 0){
 			double x = Math.random();
-			if (x < .99){
+			if (x < .50){
 				p = "M ";
 			}
 			else{
@@ -121,7 +140,7 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("HH") == 0){
 			double x = Math.random();
-			if (x < .50){
+			if (x < .25){
 				p = "SH";
 			}
 			if (x < .75){
@@ -195,7 +214,7 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("S ") == 0){
 			double x = Math.random();
-			if (x < .75){
+			if (x < .50){
 				p = "S";
 			}
 			else{
