@@ -1,4 +1,4 @@
-aardvark=aard·vark
+aard·vark
 abattoir=ab·at·toir
 abaci=ab·a·ci
 abacus=ab·a·cus
@@ -7621,7 +7621,7 @@ cone=cone
 conk=conk
 cons=cons
 cons=cons
-conservation=conserva·tion
+conservation=con·ser·va·tion
 concatenate=con·cat·e·nate
 concatenation=con·cat·e·na·tion
 concave=con·cave

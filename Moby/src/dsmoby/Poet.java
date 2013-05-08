@@ -39,13 +39,13 @@ public class Poet {
 	
 	public static void main(String[] args){
 		//comment out next 5 lines when using GraceGrammar to avoid duplicate printouts
-//		moby = new Moby("cmupronRand.txt", 
-//				"mpos.txt",
-//				"flist.txt",
-//				"infl.txt");
-//		moby.setScowlThreshold(60);
-		
-		grammar = new GraceGrammar();
+		moby = new Moby("cmupronRand.txt", 
+				"mpos.txt",
+				"flist.txt",
+				"infl.txt");
+		moby.setScowlThreshold(60);
+
+		//grammar = new GraceGrammar();
 		//System.out.println(grammar.makeSentence());
 		//String poem = writeIambicPoemRhyme(5, 14);	// Sonnet
 		//String poem = writeDoubleDactyl();
@@ -56,8 +56,9 @@ public class Poet {
 		//moby.printAllWords();
 		//moby.printAllVerbs();
 		//moby.shiftChoose();
-		String freeVerse = writeFreeVerseVerbs(3);
-		System.out.println(freeVerse);
+		//String freeVerse = writeFreeVerseVerbs(3);
+		//System.out.println(freeVerse);
+		writeHaiku("Eternal bliss sponge\nlife without anybody\nsometimes we are here");
 		
 	}// hello
 	
@@ -259,7 +260,7 @@ public class Poet {
 		
 		return dd;
 	}
-
+	
 	
 	public static String writeHaiku(String haiku)
 	{
@@ -286,7 +287,7 @@ public class Poet {
 		int ls3 = tok3.countTokens();
 		*/
 		
-		SyllableWorker j = new SyllableWorker("SyllablesP1.txt");
+		SyllableWorker j = new SyllableWorker("SyllablesP1.txt", moby);
 				
 		while(tok1.hasMoreTokens())
 		{

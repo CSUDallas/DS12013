@@ -746,6 +746,30 @@ public class Moby {
 		
 	}
 	
+	public int getNumSyllables(String s){
+		MobyWord w = this.findWord(s, words.root);
+		if(w != null)
+			return w.stressString.length();
+		else
+			return -1;
+	}
+	
+	public String findWordWithPhones(String ph){
+		DSElement<MobyWord> mwe = wordsList.first;
+		while (mwe != null){
+			if(mwe.getItem().phoneString.compareTo(ph.substring(0, ph.length())) == 0){
+				if(mwe.getItem().phoneString.length() <= ph.length()){
+					String w = mwe.getItem().word;
+					return w;
+				}
+			}
+			else{
+				mwe = mwe.getNext();
+			}
+		}
+		return null;
+	}
+	
   
 }
 		

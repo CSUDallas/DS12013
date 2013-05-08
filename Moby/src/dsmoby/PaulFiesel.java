@@ -10,11 +10,17 @@ public class PaulFiesel {
 				"infl.txt");
 		moby.setScowlThreshold(60);
 
-		String sentence = "He walked the dog very far";
+		String sentence = "Basketball is a sport";
 		String phoneString = moby.getAllPhones(sentence);
 		String newPhoneString = changeAllPhones(phoneString);
-		String newSentence = makeNewSentence(newPhoneString);
-		System.out.println(newSentence);
+		//String newSentence = makeNewSentence(newPhoneString);
+		String w = moby.findWordWithPhones(newPhoneString);
+		while(w == null){
+			changeAllPhones(phoneString);
+			moby.findWordWithPhones(newPhoneString);
+		}
+		System.out.println(newPhoneString);
+		System.out.println(w);
 	}
 
 	/*
@@ -55,18 +61,18 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("B ") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "P ";
+			if (x < .99){
+				p = "M ";
 			}
 			else{
-				p = "D ";
+				p = "B ";
 			}
 			return p;
 		}
 		if (p.compareTo("CH") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "TH";
+				p = "CH";
 			}
 			else{
 				p = "SH";
@@ -76,10 +82,10 @@ public class PaulFiesel {
 		if (p.compareTo("D ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "P ";
+				p = "B ";
 			}
 			else{
-				p = "K ";
+				p = "D ";
 			}
 			return p;
 		}
@@ -99,7 +105,7 @@ public class PaulFiesel {
 				p = "P ";
 			}
 			else{
-				p = "D ";
+				p = "F ";
 			}
 			return p;
 		}
@@ -109,7 +115,7 @@ public class PaulFiesel {
 				p = "K ";
 			}
 			else{
-				p = "CH";
+				p = "G";
 			}
 			return p;
 		}
@@ -117,6 +123,9 @@ public class PaulFiesel {
 			double x = Math.random();
 			if (x < .50){
 				p = "SH";
+			}
+			if (x < .75){
+				p = "HH";
 			}
 			else{
 				p = "CH";
@@ -126,17 +135,17 @@ public class PaulFiesel {
 		if (p.compareTo("K ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "G ";
+				p = "T ";
 			}
 			else{
-				p = "N ";
+				p = "K ";
 			}
 			return p;
 		}
 		if (p.compareTo("L ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "P ";
+				p = "L ";
 			}
 			else{
 				p = "Y ";
@@ -146,7 +155,7 @@ public class PaulFiesel {
 		if (p.compareTo("M ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "S ";
+				p = "M ";
 			}
 			else{
 				p = "N ";
@@ -156,7 +165,7 @@ public class PaulFiesel {
 		if (p.compareTo("N ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "S ";
+				p = "N ";
 			}
 			else{
 				p = "M ";
@@ -186,11 +195,11 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("S ") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "SH";
+			if (x < .75){
+				p = "S";
 			}
 			else{
-				p = "Z ";
+				p = "T ";
 			}
 			return p;
 		}
@@ -207,7 +216,7 @@ public class PaulFiesel {
 		if (p.compareTo("T ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "K ";
+				p = "T ";
 			}
 			else{
 				p = "P ";
@@ -240,7 +249,7 @@ public class PaulFiesel {
 				p = "V ";
 			}
 			else{
-				p = "M ";
+				p = "W ";
 			}
 			return p;
 		}

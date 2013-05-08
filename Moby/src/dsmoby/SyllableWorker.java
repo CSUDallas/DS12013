@@ -10,10 +10,10 @@ public class SyllableWorker<E> {
 	int x = 0;
 	
 	public SyllableWorker(){
-		this("");
+		this("", null);
 	}
 
-	public SyllableWorker(String sFile){
+	public SyllableWorker(String sFile, Moby m){
 
 		if(sFile == "")
 			return;
@@ -39,7 +39,10 @@ public class SyllableWorker<E> {
 				int syllables = tokenizer1.countTokens();
 				x++;
 				newSyllable += word + " " + syllables + "\n";
-				
+				int sss = m.getNumSyllables(word);
+				if(syllables != sss){
+					System.out.println("Mismatch: " + word + " " + syllables + " vs. " + sss);
+				}
 			}
 
 		} catch (IOException x) {
