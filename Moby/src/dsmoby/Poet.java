@@ -36,7 +36,7 @@ public class Poet {
 	private static GraceGrammar grammar;
 	
 	// This is a wonderful comment!
-	
+
 	public static void main(String[] args){
 		//comment out next 5 lines when using GraceGrammar to avoid duplicate printouts
 		moby = new Moby("cmupronRand.txt", 
@@ -47,9 +47,9 @@ public class Poet {
 
 		//grammar = new GraceGrammar();
 		//System.out.println(grammar.makeSentence());
-		//String poem = writeIambicPoemRhyme(5, 14);	// Sonnet
+		String poem = writeIambicPoemRhyme(5, 14);	// Sonnet
 		//String poem = writeDoubleDactyl();
-		//System.out.println(poem);
+		System.out.println(poem);
 		//System.out.println(moby.getAllPhones("He walked the dog very far"));
 		//gram = new PoemGrammar();
 		//System.out.println(gram.makeSentence());
@@ -58,7 +58,8 @@ public class Poet {
 		//moby.shiftChoose();
 		//String freeVerse = writeFreeVerseVerbs(3);
 		//System.out.println(freeVerse);
-		writeHaiku("Eternal bliss sponge\nlife without anybody\nsometimes we are here");
+		
+		//System.out.println(writeHaiku("Eternal bliss sponge" + "\n" + "life without anybody" + "\n" + "sometimes we are here"));
 		
 	}// hello
 	
@@ -287,7 +288,7 @@ public class Poet {
 		int ls3 = tok3.countTokens();
 		*/
 		
-		SyllableWorker j = new SyllableWorker("SyllablesP1.txt", moby);
+		SyllableWorker j = new SyllableWorker("SyllablesP1.txt"); 
 				
 		while(tok1.hasMoreTokens())
 		{
