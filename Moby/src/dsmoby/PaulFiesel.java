@@ -2,7 +2,7 @@ package dsmoby;
 
 public class PaulFiesel {	
 	private static Moby moby = null;
-
+	
 	public static void main(String[] args) {
 		moby = new Moby("cmupronRand.txt", 
 				"mpos.txt",
@@ -10,6 +10,7 @@ public class PaulFiesel {
 				"infl.txt");
 		moby.setScowlThreshold(60);
 
+<<<<<<< HEAD
 		String sentence = "Computers are very tricky";
 		String newSentence = makeNewSentence(sentence);
 		System.out.println(newSentence);
@@ -46,6 +47,8 @@ public class PaulFiesel {
 			System.out.println(newSentence);
 			int phoneLength = moby.getAllPhones(word).length();
 			ph = ph.substring(phoneLength);
+=======
+>>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 		String sentence =  "I love to play basketball on hot days with the sun up high and my jeans down low.";
 		String phoneString = moby.getAllPhones(sentence);
 		String newPhoneString = changeAllPhones(phoneString);
@@ -54,7 +57,10 @@ public class PaulFiesel {
 			newPhoneString = changeAllPhones(phoneString);
 			newSentence = BuildNewSentence(newPhoneString);
 		}
+<<<<<<< HEAD
 		return newSentence;
+=======
+>>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 		//w.BuildNewSentence(___);
 		
 		//System.out.println(newPhoneString);
@@ -85,6 +91,22 @@ public class PaulFiesel {
 			return newph;
 		}
 		return null;
+<<<<<<< HEAD
+=======
+	}
+
+
+
+
+
+	
+	/*
+	 * Takes as input a long string of phones
+	 * Produces a sentence using those phones.
+	 */
+	private static String makeNewSentence(String s){
+		return "";
+>>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 	}
 
 
@@ -109,7 +131,11 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("B ") == 0){
 			double x = Math.random();
+<<<<<<< HEAD
 			if (x < .33){
+=======
+			if (x < .50){
+>>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 				p = "M ";
 			}
 			else if (x < .66){

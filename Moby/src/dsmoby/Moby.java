@@ -759,17 +759,6 @@ public class Moby {
 
 	public String findWordWithPhones(String ph){
 		DSElement<MobyWord> mwe = wordsList.first;
-		int randomStart = (int)(Math.random() * wordsList.count);
-		for(int i = 0; i < randomStart; i++)
-			mwe = mwe.getNext();
-		int counter = wordsList.count;
-		while (counter >= 0){
-			String mws = mwe.getItem().phoneString;
-			if(mws.length() <= ph.length()){
-				String phs = ph.substring(0, mws.length());
-				if(mws.compareTo(phs) == 0){
-					return mwe.getItem().word;
-				}
 		while (mwe != null){
 			String mws = mwe.getItem().phoneString;
 			if(mws.length() > ph.length()){
@@ -781,10 +770,10 @@ public class Moby {
 				String w = mwe.getItem().word;
 				return w;
 			}
-			mwe = mwe.getNext();
-			if(mwe == null)
-				mwe = wordsList.first;
-			counter--;
+			else{
+				mwe = mwe.getNext();
+				continue;
+			}
 		}
 		return null;
 	}
