@@ -10,45 +10,6 @@ public class PaulFiesel {
 				"infl.txt");
 		moby.setScowlThreshold(60);
 
-<<<<<<< HEAD
-		String sentence = "Computers are very tricky";
-		String newSentence = makeNewSentence(sentence);
-		System.out.println(newSentence);
-	}
-
-	/*
-	 * Takes as input a sentence
-	 * Produces a sentence using a variation of the phones of that sentence.
-	 */
-	private static String makeNewSentence(String s){
-		String ph = moby.getAllPhones(s);
-		String newPhoneString = changeAllPhones(ph);
-		String newSentence = makeNewSentenceFromPhones(newPhoneString);
-		while(newSentence == null){
-			newPhoneString = changeAllPhones(ph);
-			newSentence = makeNewSentenceFromPhones(newPhoneString);
-		}
-		return newSentence;
-	}
-
-	private static String makeNewSentenceFromPhones(String ph){
-		String newSentence = "";
-		String word = "";
-		while(ph.length() > 0){
-			int counter = 10;	// try to find a word 100 times
-			while(counter > 0){
-				word = moby.findWordWithPhones(ph);
-				//System.out.print(counter + " ");
-				if(word != null) break;
-				counter--;
-			}
-			if(counter == 0) return null;
-			newSentence += word + " ";
-			System.out.println(newSentence);
-			int phoneLength = moby.getAllPhones(word).length();
-			ph = ph.substring(phoneLength);
-=======
->>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 		String sentence =  "I love to play basketball on hot days with the sun up high and my jeans down low.";
 		String phoneString = moby.getAllPhones(sentence);
 		String newPhoneString = changeAllPhones(phoneString);
@@ -57,10 +18,6 @@ public class PaulFiesel {
 			newPhoneString = changeAllPhones(phoneString);
 			newSentence = BuildNewSentence(newPhoneString);
 		}
-<<<<<<< HEAD
-		return newSentence;
-=======
->>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 		//w.BuildNewSentence(___);
 		
 		//System.out.println(newPhoneString);
@@ -91,8 +48,6 @@ public class PaulFiesel {
 			return newph;
 		}
 		return null;
-<<<<<<< HEAD
-=======
 	}
 
 
@@ -106,7 +61,6 @@ public class PaulFiesel {
 	 */
 	private static String makeNewSentence(String s){
 		return "";
->>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 	}
 
 
@@ -131,11 +85,7 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("B ") == 0){
 			double x = Math.random();
-<<<<<<< HEAD
 			if (x < .33){
-=======
-			if (x < .50){
->>>>>>> branch 'master' of https://github.com/CSUDallas/DS12013.git
 				p = "M ";
 			}
 			else if (x < .66){
