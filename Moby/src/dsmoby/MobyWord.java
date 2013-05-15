@@ -46,7 +46,7 @@ public class MobyWord implements Comparable<MobyWord> {
 	public boolean		isNominative;
 
 	public DSLinkedList<MobyWord> 	synonyms;
-
+	public DSLinkedList<MobyWord> nextWords;	// Reid Hansen's project
 
 	public MobyWord(){
 		word = "";
@@ -88,6 +88,7 @@ public class MobyWord implements Comparable<MobyWord> {
 		isIndefArticle = false;
 		isNominative = false;
 		synonyms = new DSLinkedList<MobyWord>();
+		nextWords = new DSLinkedList<MobyWord>();
 	}
 
 

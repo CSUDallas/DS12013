@@ -1,3 +1,4 @@
+//Final uploaded 5/7/13
 package latina;
 
 import java.util.ArrayList;
@@ -16,11 +17,32 @@ import java.util.Calendar;
           INTERJ,    --  INTERJection
           /
  */
+
+/*
+ * XXX
+ * XXX 
+ * XXX
+ * XXX 
+ * This file contains old methods and functionality that has been 
+ * updated in the Dactyl, Decline, and Conjugate classes
+ * ALL THINGS HERE ARE OLD VERSIONS
+ * and are NOT MEANT TO BE RUN
+ * TEST VERSIONS ONLY
+ * XXX
+ * XXX 
+ * XXX
+ * XXX 
+ */
+
+
+
+// * TEST VERSIONS ONLY *
 public class LatinPoet {
 	private static ServumVerbi sv;
 	private static int counter;
 	private static Calendar rightNow;
 	public static void main(String[] args) {
+		System.out.println("You are using LatinPoet.java to test methods, etc.");
 		sv = new ServumVerbi("DICTLINERAND.GEN",
 				"InflectsMacs.txt", "LatinMacronFile.xml");
 

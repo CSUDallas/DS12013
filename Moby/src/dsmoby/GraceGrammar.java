@@ -258,7 +258,4 @@ PRED --> VP | V OBJ
 VP --> V | V OBJ | ADV VP
 OBJ --> NP
 V --> "likes" | "eats" | "runs" | etc...
-
-
-
- */
+*/

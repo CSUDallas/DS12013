@@ -849,7 +849,6 @@ public class Moby {
 		}
 		return null;
 	}
-	
 		
 	public String punctuation2(){
 		Random rand = new Random();
@@ -871,5 +870,3 @@ public class Moby {
 }
 		
 	
-
-

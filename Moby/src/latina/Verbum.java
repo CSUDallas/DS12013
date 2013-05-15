@@ -1,3 +1,4 @@
+//Final uploaded 5/7/13
 package latina;
 /*
  * Verbum holds a Latin word from the big dictionary file.
