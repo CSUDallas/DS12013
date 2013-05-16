@@ -154,6 +154,8 @@ public class MobyWord implements Comparable<MobyWord> {
 	 * stresses.
 	 */
 	public boolean fits(String stresses, boolean exact){
+		if(stresses.equals(""))
+			return true;
 		if(stresses.length() < stressString.length() ||
 				(exact && stresses.length() != stressString.length()))
 			return false;
