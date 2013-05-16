@@ -1,4 +1,4 @@
-aard·vark
+aardvark=aard·vark
 abattoir=ab·at·toir
 abaci=ab·a·ci
 abacus=ab·a·cus
