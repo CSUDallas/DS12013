@@ -38,11 +38,12 @@ public class Moby {
 
 		// Now read the parts of speech file
 		System.out.println("** Reading moby parts-of-speech file");
+		int linesRead = 0;
+		int addedWords = 0;
 		try { 
 			FileReader f = new FileReader(mpos);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
-			int linesRead = 0;
 			while ((line = reader.readLine()) != null) {
 				if(linesRead % 20000 == 0)
 					System.out.print("" + (int)(linesRead * 100 / 232123) + "% ");	
@@ -52,6 +53,7 @@ public class Moby {
 				if(w != null){
 					w.word = parts[0];	// scowl's version of word is nicer
 					w.setPosString(posString);
+					addedWords++;
 				} 
 
 				linesRead++;
@@ -60,7 +62,7 @@ public class Moby {
 		} catch (IOException x) {
 			System.err.format("IOException: %s\n", x);
 		}
-		System.out.println("Done.");
+		System.out.println("\nDone. Added " + addedWords + " out of " + linesRead + " lines read");
 
 
 
@@ -70,7 +72,7 @@ public class Moby {
 			FileReader f = new FileReader(scowl);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
-			int linesRead = 0;
+			linesRead = 0;
 			while ((line = reader.readLine()) != null) {
 				if(linesRead % 50000 == 0)
 					System.out.print("" + (int)(linesRead * 100 / 513447) + "% ");	
@@ -97,7 +99,7 @@ public class Moby {
 			FileReader f = new FileReader(agid);
 			BufferedReader reader = new BufferedReader(f);
 			String line = null;
-			int linesRead = 0;
+			linesRead = 0;
 			while ((line = reader.readLine()) != null) {
 				if(linesRead % 10000 == 0)
 					System.out.print("" + (int)(linesRead * 100 / 112503) + "% ");	
@@ -259,7 +261,29 @@ public class Moby {
 		}
 
 	}
-
+	
+	public String getSynonym(String s, int scowlValue){
+		MobyWord w = findWord(s.trim(), words.root);
+		if(w == null){
+			//System.out.println("Couldn't find " + s);
+			return s;
+		}
+		DSLinkedList<MobyWord> syns = w.synonyms;
+		DSElement<MobyWord> syn = syns.first;
+		int numSyns = syns.count;
+		int x = ((int)(Math.random() * numSyns));
+		for(int i = 0; i < x; i++)
+			syn = syn.getNext();	// Find random starting point
+		x = numSyns;
+		while(x > 0){
+			if(syn == null)
+				syn = syns.first;
+			if(syn.getItem().scowlValue <= scowlValue)
+				return syn.getItem().word.trim();
+			syn = syn.getNext();
+		}
+		return s;
+		}
 
 	public String getStressWord(String stresses){
 		// Pick random starting point in the linked list
@@ -288,7 +312,7 @@ public class Moby {
 	 * This method returns a random word satisfying the following parameters:
 	 * pos      = part of speech
 	 * stresses = profile that the word must match
-	 * rhyme    = string of 2k words describing the last k phones the word must have
+	 * rhyme    = string of 2k letters describing the last k phones the word must have
 	 * exact    = true if the word must be exactly as long as the "stresses" String indicates,
 	 *          = false if it may be shorter.
 	 */
@@ -630,6 +654,76 @@ public class Moby {
 
 		return null;
 	}
+	
+	/*
+	 * Reid Hansen's project
+	 * Reads in a "book" file, and for each word in the book adds a link to 
+	 * that word's MobyWord object a reference to the MobyWord that follows
+	 * it in the text. Adds each following word as many times as it follows
+	 * it in the text.
+	 */
+	public void setNextWords(String book){
+		System.out.println("** Reading Book File");
+		try { 
+			FileReader f = new FileReader(book);
+			BufferedReader reader = new BufferedReader(f);
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				line = line.replaceAll("[\\?,~<01234567890!_-]", "");	
+				String[] parts = line.split(" ");
+				for(int i = 0; i < parts.length; i++){
+					//System.out.print(parts[i] + "\n");
+					MobyWord w = findWord(parts[i], words.root);
+					if(w != null && i < parts.length - 1){
+						MobyWord l = findWord(parts[i + 1], words.root);
+						if(l != null){
+							w.nextWords.addLast(l);
+						}
+					}
+				}
+			}
+			reader.close();
+		} catch (IOException x) {
+			System.err.format("IOException: %s\n", x);
+		}
+		System.out.println("Done Reading Book File");
+
+	}
+
+
+
+	/*
+	 * Reid Hansen's project
+	 * Uses nextWords to find an appropriate next word.
+	 *
+	 * Just like getWord except you need to pass the priorWord as well.
+	 * Then it selects a random next word from the "nextWords" field, if there are any.
+	 */
+	public String getSmartWord(String pos, String stresses, String rhyme, boolean exact, String priorWord){
+		// Pick random starting point in the linked list
+		MobyWord l = findWord(priorWord, words.root);
+
+		int start = (int)(Math.random() * l.nextWords.size());
+		DSElement<MobyWord> w = l.nextWords.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+
+		// From this point, find the first word (weakly)matching our stresses pattern
+		int count = l.nextWords.size();	// failsafe counter
+		while(count > 0){
+			if(w.getItem().fits(stresses, exact) && 
+					w.getItem().scowlValue <= this.scowlThreshold &&
+					w.getItem().isPos(pos) && w.getItem().rhymesWith(rhyme))
+				return w.getItem().word;
+			w = w.getNext();
+			if(w == null)
+				w = wordsList.first;
+			count--;
+		}
+		// When the getSmartWord Fails it will just look through all words
+		return getWord(pos, stresses, rhyme, exact);  
+		//return "";	// Failsafe word
+	}
 
 
 	/*
@@ -772,14 +866,29 @@ public class Moby {
 			}
 			else{
 				mwe = mwe.getNext();
+				continue;
 			}
 		}
 		return null;
 	}
-}
+		
+	public String punctuation2(){
+		Random rand = new Random();
+		String[] tenseList = {",", " - ", " ", ":", ";"};
+		String pMark = tenseList[rand.nextInt(tenseList.length)];
+		return pMark;
+		
+	}
+	
+		
+	public String meterSelect(){
+		Random rand = new Random();
+		String[] meterList = {"01", "1", "0101", "101", "10", "010"};
+		String randMeter = meterList[rand.nextInt(meterList.length)];
+		return randMeter;
+	}
+	
   
-
+}
 		
 	
-
-
