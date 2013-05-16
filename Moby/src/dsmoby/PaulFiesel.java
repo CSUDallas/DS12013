@@ -2,7 +2,7 @@ package dsmoby;
 
 public class PaulFiesel {	
 	private static Moby moby = null;
-
+	
 	public static void main(String[] args) {
 		moby = new Moby("cmupronRand.txt", 
 				"mpos.txt",
@@ -10,10 +10,17 @@ public class PaulFiesel {
 				"infl.txt");
 		moby.setScowlThreshold(60);
 
-		String sentence = "He walked the dog very far";
+		String sentence =  "I love to play basketball on hot days with the sun up high and my jeans down low.";
 		String phoneString = moby.getAllPhones(sentence);
 		String newPhoneString = changeAllPhones(phoneString);
-		String newSentence = makeNewSentence(newPhoneString);
+		String newSentence = BuildNewSentence(newPhoneString);
+		while(newSentence == null){
+			newPhoneString = changeAllPhones(phoneString);
+			newSentence = BuildNewSentence(newPhoneString);
+		}
+		//w.BuildNewSentence(___);
+		
+		//System.out.println(newPhoneString);
 		System.out.println(newSentence);
 	}
 
@@ -30,6 +37,24 @@ public class PaulFiesel {
 		return returnString;
 	}
 
+	private static String BuildNewSentence(String ph){
+		String newph = "";
+		while(ph.length() > 0){
+			String w = moby.findWordWithPhones(ph);
+			
+			ph = ph.substring(moby.getAllPhones(w).length(), ph.length());
+			newph += w + " ";
+			
+			return newph;
+		}
+		return null;
+	}
+
+
+
+
+
+	
 	/*
 	 * Takes as input a long string of phones
 	 * Produces a sentence using those phones.
@@ -38,6 +63,11 @@ public class PaulFiesel {
 		return "";
 	}
 
+
+
+
+
+	
 	/*
 	 * Takes a 2-character phone string as input and
 	 * returns a similar-sounding 2-character phone string.
@@ -45,28 +75,31 @@ public class PaulFiesel {
 	private static String changeOnePhone(String p){
 		if (p.compareTo("S ") == 0){
 			double x = Math.random();
-			if (x < .50){
+			if (x < .33){
 				p = "Z ";
 			}
-			else if (x < .50){
+			else if (x < .66){
 				p = "SH";
 			}
 			return p;
 		}
 		if (p.compareTo("B ") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "P ";
+			if (x < .33){
+				p = "M ";
+			}
+			else if (x < .66){
+				p = "V ";
 			}
 			else{
-				p = "D ";
+				p = "B ";
 			}
 			return p;
 		}
 		if (p.compareTo("CH") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "TH";
+				p = "CH";
 			}
 			else{
 				p = "SH";
@@ -75,18 +108,24 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("D ") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "P ";
+			if (x < .33){
+				p = "T ";
+			}
+			else if (x < .66){
+				p = "TH";
 			}
 			else{
-				p = "K ";
+				p = "D ";
 			}
 			return p;
 		}
 		if (p.compareTo("DH") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "B ";
+			if (x < .33){
+				p = "TH";
+			}
+			else if (x < .66){
+				p = "DH";
 			}
 			else{
 				p = "T ";
@@ -96,10 +135,10 @@ public class PaulFiesel {
 		if (p.compareTo("F ")== 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "P ";
+				p = "V ";
 			}
 			else{
-				p = "D ";
+				p = "F ";
 			}
 			return p;
 		}
@@ -109,17 +148,20 @@ public class PaulFiesel {
 				p = "K ";
 			}
 			else{
-				p = "CH";
+				p = "G";
 			}
 			return p;
 		}
 		if (p.compareTo("HH") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "SH";
+			if (x < .33){
+				p = "EH";
+			}
+			if (x < .66){
+				p = "HH";
 			}
 			else{
-				p = "CH";
+				p = "EHHH";
 			}
 			return p;
 		}
@@ -129,37 +171,37 @@ public class PaulFiesel {
 				p = "G ";
 			}
 			else{
-				p = "N ";
+				p = "K ";
 			}
 			return p;
 		}
 		if (p.compareTo("L ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "P ";
+				p = "L ";
 			}
 			else{
-				p = "Y ";
+				p = "EHL ";
 			}
 			return p;
 		}
 		if (p.compareTo("M ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "S ";
+				p = "M ";
 			}
 			else{
-				p = "N ";
+				p = "B ";
 			}
 			return p;
 		}
 		if (p.compareTo("N ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "S ";
+				p = "N ";
 			}
 			else{
-				p = "M ";
+				p = "D ";
 			}
 			return p;
 		}
@@ -169,17 +211,17 @@ public class PaulFiesel {
 				p = "F ";
 			}
 			else{
-				p = "T ";
+				p = "V ";
 			}
 			return p;
 		}
 		if (p.compareTo("R ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "P ";
+				p = "R ";
 			}
 			else{
-				p = "M ";
+				p = "EHR ";
 			}
 
 			return p;
@@ -187,7 +229,7 @@ public class PaulFiesel {
 		if (p.compareTo("S ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "SH";
+				p = "S";
 			}
 			else{
 				p = "Z ";
@@ -196,8 +238,11 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("SH") == 0){
 			double x = Math.random();
-			if (x < .50){
+			if (x < .33){
 				p = "S ";
+			}
+			else if (x < .66){
+				p = "SH";
 			}
 			else{
 				p = "TH";
@@ -207,17 +252,20 @@ public class PaulFiesel {
 		if (p.compareTo("T ") == 0){
 			double x = Math.random();
 			if (x < .50){
-				p = "K ";
+				p = "T ";
 			}
 			else{
-				p = "P ";
+				p = "D ";
 			}
 			return p;
 		}
 		if (p.compareTo("TH") == 0){
 			double x = Math.random();
-			if (x < .50){
-				p = "SH";
+			if (x < .33){
+				p = "DH";
+			}
+			else if (x < .66){
+				p = "TH";
 			}
 			else{
 				p = "T ";
@@ -230,7 +278,7 @@ public class PaulFiesel {
 				p = "F ";
 			}
 			else{
-				p = "W ";
+				p = "V ";
 			}
 			return p;
 		}
@@ -240,7 +288,7 @@ public class PaulFiesel {
 				p = "V ";
 			}
 			else{
-				p = "M ";
+				p = "W ";
 			}
 			return p;
 		}
@@ -257,14 +305,229 @@ public class PaulFiesel {
 		}
 		if (p.compareTo("Z ") == 0){
 			double x = Math.random();
-			if (x < .50){
+			if (x < .33){
 				p = "SH";
+			}
+			else if (x < .66){
+				p = "Z ";
 			}
 			else{
 				p = "S ";
 			}
 			return p;
 		}
+		
+		// Now the vowels
+		if (p.compareTo("AA") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AA";
+			}
+			else if (x < .66){
+				p = "HHAA";
+			}
+			else{
+				p = "AO";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("AE") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AA";
+			}
+			else if (x < .66){
+				p = "AE";
+			}
+			else{
+				p = "AO";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("AH") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AH";
+			}
+			else if (x < .66){
+				p = "EH";
+			}
+			else{
+				p = "OW";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("AO") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AW";
+			}
+			else if (x < .66){
+				p = "AO";
+			}
+			else{
+				p = "OW";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("AW") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AE";
+			}
+			else if (x < .66){
+				p = "AW";
+			}
+			else{
+				p = "AA";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("AY") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "AY";
+			}
+			else if (x < .66){
+				p = "HHAY";
+			}
+			else{
+				p = "OY";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("EH") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "EH";
+			}
+			else if (x < .66){
+				p = "AE";
+			}
+			else{
+				p = "EY";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("ER") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "ER";
+			}
+			else if (x < .66){
+				p = "HHER";
+			}
+			else{
+				p = "EHER";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("EY") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "EY";
+			}
+			else if (x < .66){
+				p = "AE";
+			}
+			else{
+				p = "EH";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("IH") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "IH";
+			}
+			else if (x < .66){
+				p = "EH";
+			}
+			else{
+				p = "AE";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("IY") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "IY";
+			}
+			else if (x < .66){
+				p = "IH";
+			}
+			else{
+				p = "EH";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("OW") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "OW";
+			}
+			else if (x < .66){
+				p = "AO";
+			}
+			else{
+				p = "OWHH";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("OY") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "OY";
+			}
+			else if (x < .66){
+				p = "OWIY";
+			}
+			else{
+				p = "HHOY";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("UH") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "UH";
+			}
+			else if (x < .66){
+				p = "AH";
+			}
+			else{
+				p = "AO";
+			}
+			return p;
+		}
+		
+		if (p.compareTo("UW") == 0){
+			double x = Math.random();
+			if (x < .33){
+				p = "UW";
+			}
+			else if (x < .66){
+				p = "EHW ";
+			}
+			else{
+				p = "ER";
+			}
+			return p;
+		}
+		
 		return p;
 	}
 }

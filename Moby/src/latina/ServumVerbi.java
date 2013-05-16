@@ -1,8 +1,11 @@
+//Final uploaded 5/7/13
 package latina;
 /*
  * ServumVerbi is a server of Verba - it reads three files, a dictionary, inflects (endings), and a macron dictionary
  * This class also contains all methods to get Verba and Termini
  * Macrons are also processed here
+ * 
+ * XXX Run Configurations: encoding must be set to UTF-8
  */
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,14 +20,15 @@ public class ServumVerbi {
 	public DSBinaryTree<Verbum> wordTree; 
 	public DSLinkedList<Verbum> words;
 	public DSLinkedList<Terminus> inflects; 
+	public boolean useBinTree = false;
 	int ft = 0, nft = 0;
 	private Calendar rightNow;
 
 	public ServumVerbi(String dict, String flec, String macron) {
 		//Starts a counter to get time elapsed for reading files
 		rightNow = Calendar.getInstance();
-		int startMin = rightNow.get(rightNow.MINUTE);
-		int startSec = rightNow.get(rightNow.SECOND);
+		int startMin = rightNow.get(Calendar.MINUTE);
+		int startSec = rightNow.get(Calendar.SECOND);
 		//Initialize words DSLinkedList
 		words = new DSLinkedList<Verbum>();
 
@@ -109,8 +113,8 @@ public class ServumVerbi {
 
 		//Get current time and calculate the time elapsed for reading files
 		rightNow = Calendar.getInstance();
-		int endMin = rightNow.get(rightNow.MINUTE);
-		int endSec = rightNow.get(rightNow.SECOND);
+		int endMin = rightNow.get(Calendar.MINUTE);
+		int endSec = rightNow.get(Calendar.SECOND);
 		int time = (endMin-startMin)*60 + endSec-startSec;
 		System.out.println("Time elapsed (sec): " + time);
 	}
@@ -123,6 +127,8 @@ public class ServumVerbi {
 	 * If it finds it, sets its macrons field equal to the asterisked string.
 	 */
 	private boolean processMacrons(String key, String orth){
+		Verbum v;
+
 		if(key.length() != orth.length()){	// This should never happen!
 			System.out.println("Different length! =" + key + "=, =" + orth + "=");
 			return false;
@@ -135,9 +141,14 @@ public class ServumVerbi {
 				macronForm = macronForm + key.charAt(i);
 		}
 		//System.out.println(key + ", " + orth + ", " + macronForm);
-		Verbum v = findWordByNomForm(key, wordTree.root); //Found 8367, failed to find: 9214 - Sec. 8
-		// --- Use below with Linked List
-		//Verbum v = findWordByNomForm(key); //Found 13620, failed to find: 3961 - SEc. 20
+		//Whether or not to use the binary tree for the searching
+		if(useBinTree){
+			//Binary Tree
+			v = findWordByNomForm(key, wordTree.root); //Found 8367, failed to find: 9214 - Sec. 8
+		} else {
+			//Linked List
+			v = findWordByNomForm(key); //Found 13576, failed to find: 4005 - Sec. 20
+		}
 		if(v != null){
 			v.macrons = macronForm;
 			words.addLast(v);
@@ -158,18 +169,21 @@ public class ServumVerbi {
 		}
 	}
 	/*
-	 * XXX Deprecated method, use findWordByNomForm(String nomForm, DSElement<Verbum> start)
+	 * XXX This method uses a LinkedList for searching
 	 * Searches the words list for a Verbum whose nom field equals nomForm
-	 * Uses the linked list for searching
 	 * XXX This would go quicker if we were in a binary tree... but we seem to lose some
+	 * Use findWordByNomForm(String nomForm, DSElement<Verbum> start) for Binary Tree
 	 */
 	public Verbum findWordByNomForm(String nomForm){
 		DSElement<Verbum> e = tempWords.first;
 		while(e != null){
-			if(e.getItem().nom.equals(nomForm))
+			if(e.getItem().nom.equals(nomForm)){
+				//Use this one instead to get capitalized words also
+				//if(e.getItem().nom.compareToIgnoreCase(nomForm)==0)
 				return e.getItem();
-			else
+			} else {
 				e = e.getNext();
+			}
 		}
 		return null;
 	}
@@ -191,8 +205,8 @@ public class ServumVerbi {
 		return null;
 	}
 	/*
-	 * Runs delNomFromMac(Verbum w) on each Verbum
-	 * Then adds macrons to form1, form2, form3, form4
+	 * Runs delNomFromMac(), macsToForms(), and specialMacs() on each Verbum
+	 * adds macrons to form1, form2, form3, form4
 	 */
 	public void doMacrons(){
 		DSElement<Verbum> w = words.first;
@@ -205,11 +219,8 @@ public class ServumVerbi {
 				//insert macrons into forms
 				macsToForms(w.getItem());
 				//System.out.println(w.getItem().macForm);
-				//Insert special macrons into verbs
-				if(w.getItem().pos.equals("V")){
-					specialMacs(w.getItem());
-					//System.out.println(w.getItem().form3 + " " + w.getItem().form4);
-				}
+				//Insert special macrons 
+				specialMacs(w.getItem());
 			}
 			w = w.getNext();
 			if(w == null)
@@ -222,8 +233,10 @@ public class ServumVerbi {
 	 */
 	public void delNomFromMac(Verbum w){
 		w.macForm = w.macrons.substring(0, w.macrons.length()-w.nomFormLengh);
-		if(w.macForm.charAt(w.macForm.length()-1)=='*'){
-			w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+		if(w.macForm.length()>0){ //avoid index out of bounds
+			if(w.macForm.charAt(w.macForm.length()-1)=='*'){
+				w.macForm = w.macForm.substring(0, w.macForm.length()-2);
+			}
 		}
 		return;
 	}
@@ -233,58 +246,70 @@ public class ServumVerbi {
 	public void macsToForms(Verbum w){
 		char[] letters = w.macForm.toCharArray();
 		ArrayList<Integer> indecies = new ArrayList<Integer>();
-		int c = 0;
 		for(int i = 0; i<letters.length; i++){ //Make into ints
 			if(letters[i]=='*'){
 				indecies.add(i);
-				c++;
 			}
 		}
-		c = 0;
-		for(int s : indecies){
-			w.form1 = new StringBuffer(w.form1).insert(s, "*").toString();
-			if(w.form2.length()>=findLargest(indecies)){
-				w.form2 = new StringBuffer(w.form2).insert(s, "*").toString();
-			}
-			if(w.form3.length()>=findLargest(indecies)){
-				w.form3 = new StringBuffer(w.form3).insert(s, "*").toString();
-			}
-			if(w.form4.length()>=findLargest(indecies)){
-				w.form4 = new StringBuffer(w.form4).insert(s, "*").toString();
-			}
-			c++;
-		}	
+		if(w.form1.equals("caedes")){ //Special case
+			w.form1 = w.macForm;
+		} else {
+			for(int s : indecies){
+				w.form1 = new StringBuffer(w.form1).insert(s, "*").toString();
+				if(w.form2.length()>=findLargest(indecies)){
+					w.form2 = new StringBuffer(w.form2).insert(s, "*").toString();
+				}
+				if(w.form3.length()>=findLargest(indecies)){
+					w.form3 = new StringBuffer(w.form3).insert(s, "*").toString();
+				}
+				if(w.form4.length()>=findLargest(indecies)){
+					w.form4 = new StringBuffer(w.form4).insert(s, "*").toString();
+				}
+			}	
+		}
 	}
 	/*
-	 * Inserts macrons into special verbs which follow a pattern
+	 * Inserts macrons into special verba which follow a pattern
 	 * E.g. 1 conj verbs have long a in 3rd and 4th pp
 	 */
 	public void specialMacs(Verbum w){
-		int conj = w.cd;
+		int cd = w.cd;
 		int variant = w.variant;
 		int i = 0;
 		int index = 0;
-		
-		if(conj==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
-			do {
-				char c = w.form3.charAt(i);
-				if(isVowel(c)){
-					index = i;
-				}
-				i++;
-			} while(i<w.form3.length()-1);
-			w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
-		}
-		if (conj==1 && variant==1){
-			w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
-			w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+		if(w.pos.equals("V")){
+			//3rd conjugation have long vowel if the 1st pp stem and 3rd pp stem are one syllable
+			if(cd==3 && countSyllables(w.form2)<2 && countSyllables(w.form3)<2){		
+				do {
+					char c = w.form3.charAt(i);
+					if(isVowel(c)){
+						index = i;
+					}
+					i++;
+				} while(i<w.form3.length()-1);
+				w.form3 = new StringBuffer(w.form3).insert(index, "*").toString();
+			}
+			//First conjugation variant 1 have long a's 
+			if (cd==1 && variant==1){
+				w.form3 = new StringBuffer(w.form3).insert(w.form3.length()-2, "*").toString();
+				w.form4 = new StringBuffer(w.form4).insert(w.form4.length()-2, "*").toString();
+			}
+		} else if (w.pos.equals("N")){
+			//Some 3rd declension nouns have short o in nom and long o in all other forms
+			if (cd == 3 && w.form1.charAt(w.form1.length()-1) == 'r' && w.form2.charAt(w.form2.length()-1) == 'r' && (w.gender.equals("M") || w.gender.equals("F"))){
+				w.form2 = new StringBuffer(w.form2).insert(w.form2.length()-2, "*").toString();
+			} 
+			//Neuter 3rd declension -ar nouns have short a in nom and long a in all others
+			if (cd == 3 && w.form1.substring(w.form1.length()-2).equals("ar") && w.form2.substring(w.form2.length()-2).equals("ar")){
+				w.form2 = new StringBuffer(w.form2).insert(w.form2.length()-2, "*").toString();
+			} 
 		}
 	}
 	//Tests if char is vowel
 	public static boolean isVowel(char ch) {
 		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u' || ch == 'y';
 	}
-	//Calculates the syllable count
+	//Calculates the syllable count of a string
 	public int countSyllables(String s){
 		s = s.replace("qu", "q");
 		int i = 0;
@@ -298,87 +323,9 @@ public class ServumVerbi {
 		} while(i<s.length()-1);
 		return count;		
 	}
-	//-----END Macron Methods-----//
-	
-	public Verbum getWord(){
-		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * tempWords.size());
-		DSElement<Verbum> w = tempWords.first;
-		for(int i = 0; i < start; i++)
-			w = w.getNext();
-		return w.getItem();
-	}
-
-	public Verbum getWord(String pos, char freqLevel){
-		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * words.size());
-		DSElement<Verbum> w = words.first;
-		for(int i = 0; i < start; i++)
-			w = w.getNext();
-		char freq;    
-		//char freqLevel = 'B'; //Anything ABOVE this char will be used
-		/* Frequency:
-		 * A   full column or more, more than 50 citations - very frequent
-		 * B   half column, more than 20 citations - frequent
-		 * C   more then 5 citations - common
-		 * D   4-5 citations - lesser
-		 * E   2-3 citations - uncommon
-		 * F   only 1 citation - very rare
-		 */
-		int count = words.size()*100;    // failsafe counter
-		while(count > 0){
-			if(w.getItem().attribs.length()>3)
-				freq = w.getItem().attribs.charAt(3);
-			else 
-				freq = 'E'; // If missing feq data, just put very low - i.e. normally not called
-			//Names are not allowed to be retrieved here
-			//if(w.getItem().pos.equals(pos) && Character.compare(freq, freqLevel) < 0 && Character.isLowerCase(w.getItem().form1.charAt(0)))
-			if(w.getItem().pos.equals(pos) && freq < freqLevel && Character.isLowerCase(w.getItem().form1.charAt(0)))
-				return w.getItem();
-			w = w.getNext();
-			if(w == null)
-				w = words.first;
-			count--;
-		}
-		w.getItem().form1 = w.getItem().form1 + " BAD";
-		return w.getItem();    // Failsafe word
-	}
-
-	public Verbum getName(){
-		// Pick random starting point in the linked list
-		int start = (int)(Math.random() * tempWords.size());
-		DSElement<Verbum> w = tempWords.first;
-		for(int i = 0; i < start; i++)
-			w = w.getNext();
-		char freq;        
-		char freqLevel = 'C'; //Anything ABOVE this char will be used
-		/* Frequency:
-		 * A   full column or more, more than 50 citations - very frequent
-		 * B   half column, more than 20 citations - frequent
-		 * C   more then 5 citations - common
-		 * D   4-5 citations - lesser
-		 * E   2-3 citations - uncommon
-		 * F   only 1 citation - very rare
-		 */
-		// From this point, find the first word (weakly)matching our stresses pattern
-		int count = tempWords.size();    // failsafe counter
-		while(count > 0){
-			if(w.getItem().attribs.length()>3)
-				freq = w.getItem().attribs.charAt(3);
-			else 
-				freq = 'E';
-			if(w.getItem().pos.equals("N") && freq < freqLevel &&
-					Character.isUpperCase(w.getItem().form1.charAt(0))) //Check is first letter is capitalized
-				return w.getItem();
-			w = w.getNext();
-			if(w == null)
-				w = tempWords.first;
-			count--;
-		}
-		w.getItem().form1 = w.getItem().form1 + " BAD";
-		return w.getItem();    // Failsafe word
-	}
-
+	/*
+	 * Set the nominative form for all verba in the list
+	 */
 	public void setNoms(){
 		DSElement<Verbum> w = tempWords.first;
 		int count = tempWords.size();    // failsafe counter
@@ -390,45 +337,38 @@ public class ServumVerbi {
 				w = tempWords.first;
 			count--;
 		}
-
-		/*DSElement<Verbum> x = words.first;
-		for(int i = 0; i<words.size(); i++){
-			Verbum v = x.getItem();
-			//if(v.pos.equals("ADV")){
-			System.out.println(v.pos + " " + v.cd + " " + v.variant + " " + v.nom);
-
-			//}
-			x = x.getNext();
-		}*/
 	}
-
+	/*
+	 * Gets the nominative of a verbum and sets it to verbum.nom
+	 * w.nomFormLength is used later in delNomFromMac()
+	 */
 	public void GetNom(Verbum w){
 		DSElement<Terminus> ending = inflects.first;
 		int variant = w.variant;
 		int variant2 = -2;
 		int cd = w.cd;
 		String gender = w.gender;
-
-		int start = (int)(Math.random() * inflects.size());
-		for(int i = 0; i < start; i++)
-			ending = ending.getNext();
-		String form ="";
+		String form = "";
 		int count = inflects.size();    // failsafe counter
 		while(count > 0){
 			Terminus end = ending.getItem();
 			if(w.pos.equals("V")) { //VERB
-				//if(end.cd == cd && end.variant == variant && Integer.parseInt(end.person) == 1 && end.number.equals("S") && end.tense.equals("PRES") && 
-				//		end.voice.equals("ACTIVE") && end.mood.equals("IND")) {
-				//	form = w.form1;
-				//	w.nom = form + end.ending;
-				//	return w;					
-				//}
-				if(w.type.equals("DEP")){
-					w.nom = w.form1 + "or";
-					w.nomFormLengh = 3;
+				if(w.cd==2){
+					if(w.type.equals("DEP")){
+						w.nom = w.form1 + "eor";
+						w.nomFormLengh = 3;
+					} else {
+						w.nom = w.form1 + "eo";
+						w.nomFormLengh = 2;
+					}
 				} else {
-					w.nom = w.form1 + "o";
-					w.nomFormLengh = 2;
+					if(w.type.equals("DEP")){
+						w.nom = w.form1 + "or";
+						w.nomFormLengh = 3;
+					} else {
+						w.nom = w.form1 + "o";
+						w.nomFormLengh = 2;
+					}
 				}
 				return;
 			} else if(w.pos.equals("N") && end.pos.equals("N")) { //NOUN
@@ -474,66 +414,66 @@ public class ServumVerbi {
 					}
 				}
 			} else if(w.pos.equals("ADJ") && end.pos.equals("ADJ")) {
-				/* Some special cases */
+				/* The different declensions and variations */
 				if(cd == 1 && (variant == 1 || variant == 3 || variant == 5)) {
 					w.nom = w.form1 + "us";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
-				if(cd == 1 && (variant == 2 || variant == 4)){ //Common lots of cases
+				if(cd == 1 && (variant == 2 || variant == 4)){
 					w.nom = w.form1;
 					w.nomFormLengh = 0;
-					return; //return nom. s. 3rd decl.
+					return;
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("COMP")) {
 					w.nom = w.form1 + "or";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return;
 				}
 				if(cd == 0 && variant == 0 && w.type.equals("SUPER")) {
 					w.nom = w.form1 + "mus";
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 2 && variant == 1) {
 					w.nom = w.form1 + "e";
 					w.nomFormLengh = 2;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 2 && variant == 2) {
 					w.nom = w.form1 + "a";
 					w.nomFormLengh = 2;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 2 && variant == 3) {
 					w.nom = w.form1 + "es";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 2 && (variant == 6 || variant == 7)) {
 					w.nom = w.form1 + "os";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return;
 				}
 				if(cd == 2 && variant == 8) {
 					w.nom = w.form1 + "on";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 3 && (variant == 1 || variant == 3 || variant == 6)) {
 					w.nom = w.form1;
 					w.nomFormLengh = 0;
-					return; //return nom. s. 3rd decl.
+					return; 
 				}
 				if(cd == 3 && variant == 2) {
 					w.nom = w.form1 + "is";
 					w.nomFormLengh = 3;
-					return; //return nom. s. 3rd decl.
+					return;
 				}
 				/* END */				
 			} else if(w.pos.equals("ADV") && end.pos.equals("ADV")) {
 				w.nom = w.form1;
 				w.nomFormLengh = 0;
-				return; //return nom. s. 3rd decl.
+				return; 
 			}
 			ending = ending.getNext();
 			if(ending == null)
@@ -544,18 +484,103 @@ public class ServumVerbi {
 		w.nomFormLengh = 0;
 		return;
 	}
+	//-----END Macron Methods-----//
 
-	public static int findLargest(ArrayList<Integer> numbers){  
-		int largest = numbers.get(0);  
-		for(int s : numbers){  
-			if(s > largest){  
-				largest = s;  
-			}  
-		}  
-		return largest;
+	//-----Methods to get words from the ServumVerbi-----//
+	/*
+	 * Get a random word - noun, verb, adj, etc
+	 */
+	public Verbum getWord(){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * words.size());
+		DSElement<Verbum> w = words.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+		return w.getItem();
 	}
+	/*
+	 * Get a random word with part of speech = pos and frequency > freqLevel
+	 */
+	public Verbum getWord(String pos, char freqLevel){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * words.size());
+		DSElement<Verbum> w = words.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+		char freq;    
+		//char freqLevel = 'B'; //Anything ABOVE this char will be used
+		/* Frequency:
+		 * A   full column or more, more than 50 citations - very frequent
+		 * B   half column, more than 20 citations - frequent
+		 * C   more then 5 citations - common
+		 * D   4-5 citations - lesser
+		 * E   2-3 citations - uncommon
+		 * F   only 1 citation - very rare
+		 */
+		int count = words.size()*100;    // failsafe counter
+		while(count > 0){
+			if(w.getItem().attribs.length()>3)
+				freq = w.getItem().attribs.charAt(3);
+			else 
+				freq = 'E'; // If missing feq data, just put very low - i.e. normally not called
+			//Names are not allowed to be retrieved here
+			if(w.getItem().pos.equals(pos) && freq < freqLevel && Character.isLowerCase(w.getItem().form1.charAt(0)))
+				return w.getItem();
+			w = w.getNext();
+			if(w == null)
+				w = words.first;
+			count--;
+		}
+		w.setItem(new Verbum());
+		w.getItem().form1 = "inrepertum";
+		w.getItem().cw.item = "inrepertum";
+		//w.getItem().form1 = w.getItem().form1 + " BAD";
+		return w.getItem();    // Failsafe word
+	}
+	/*
+	 * Get a random name. A name is a capitalized word in the dictionary
+	 */
+	public Verbum getName(){
+		// Pick random starting point in the linked list
+		int start = (int)(Math.random() * words.size());
+		DSElement<Verbum> w = words.first;
+		for(int i = 0; i < start; i++)
+			w = w.getNext();
+		char freq;        
+		char freqLevel = 'C'; //Anything ABOVE this char will be used
+		/* Frequency:
+		 * A   full column or more, more than 50 citations - very frequent
+		 * B   half column, more than 20 citations - frequent
+		 * C   more then 5 citations - common
+		 * D   4-5 citations - lesser
+		 * E   2-3 citations - uncommon
+		 * F   only 1 citation - very rare
+		 */
+		int count = words.size();    // failsafe counter
+		while(count > 0){
+			if(w.getItem().attribs.length()>3)
+				freq = w.getItem().attribs.charAt(3);
+			else 
+				freq = 'E';
+			if(w.getItem().pos.equals("N") && freq < freqLevel &&
+					Character.isUpperCase(w.getItem().form1.charAt(0))) //Check is first letter is capitalized
+				return w.getItem();
+			w = w.getNext();
+			if(w == null)
+				w = words.first;
+			count--;
+		}
+		w.setItem(new Verbum());
+		w.getItem().form1 = "inrepertum";
+		w.getItem().cw.item = "inrepertum";
+		return w.getItem();    // Failsafe word
+	}
+	//-----END-----//
 
-
+	//-----Methods to get endings for verba-----//
+	/*
+	 * Gets endings for verb
+	 */
 	public Verbum vGetTerminus(Verbum w, int p, String num, String tense, String voice, String mood){
 		int cd = w.cd;
 		int variant = w.variant;
@@ -593,7 +618,7 @@ public class ServumVerbi {
 						ending.getItem().voice.equals(voice) && 
 						ending.getItem().mood.equals(mood)) {
 					form = getForm(w, ending.getItem().form);
-					if(form.equals("zzz")){
+					if(form.replace("*", "").equals("zzz")){
 						cw.item = "none";
 						return w;
 					} else {
@@ -612,7 +637,9 @@ public class ServumVerbi {
 		cw.item = "";//w.form1+"MALUM";
 		return w;
 	}
-
+	/*
+	 * Gets endings for nouns
+	 */
 	public Verbum nGetTerminus(Verbum w, String c, String num){
 		int cd = w.cd;
 		int variant = w.variant;
@@ -621,8 +648,7 @@ public class ServumVerbi {
 		DSElement<Terminus> ending = inflects.first;
 		Unilogos cw  = w.cw;
 		//cw.gender = gender;
-		//cw.wordcase = c;
-		//cw.number = num;
+		cw.wordcase = c;
 
 		int start = (int)(Math.random() * inflects.size());
 		for(int i = 0; i < start; i++)
@@ -634,6 +660,10 @@ public class ServumVerbi {
 			{
 				/* Some special cases */
 				if(cd == 3 && variant == 1){ //Common lots of cases
+					variant = 0;
+					variant2 = 1;
+				}
+				if(cd == 1 && variant == 1){ //Common lots of cases
 					variant = 0;
 					variant2 = 1;
 				}
@@ -649,11 +679,11 @@ public class ServumVerbi {
 					cw.item = w.form1;
 					return w; //return nom. s. 3rd decl.
 				}
-				if(cd == 3 && c.equals("GEN")) {
-					cw.item = w.form1 + "is";
-					cw.stem = w.form1;
+				if(cd == 3 && variant ==3 && c.equals("GEN") && num.equals("S")) {
+					cw.item = w.form2 + "is";
+					cw.stem = w.form2;
 					cw.ending = "is";
-					return w; //return nom. s. 3rd decl.
+					return w; //return gen. s. 3rd decl.
 				}
 				/* END */
 				if (ending.getItem().wordcase != null && ending.getItem().number != null){
@@ -691,11 +721,13 @@ public class ServumVerbi {
 				ending = inflects.first;
 			count--;
 		}
-		cw.item = "";//w.form1+"MALUM";
+		cw.item = "";
 		w.cw.number = num;
 		return w;
 	}
-
+	/*
+	 * Gets endings for adjectives - endings are based on the noun they agree with - m
+	 */
 	public Verbum adjGetTerminus(Verbum w, Verbum m, String c, String num){
 		int cd = w.cd;
 		int variant = w.variant;
@@ -728,7 +760,7 @@ public class ServumVerbi {
 					variant = 0;
 				if(c.equals("ABL") && (cd == 2 || cd ==4)) //Common ablatives
 					variant = 0;
-				if(cd == 3 && c.equals("NOM")) {
+				if(cd == 3 && c.equals("NOM") && variant!=2) {
 					cw.item = w.form1;
 					return w; //return nom. s. 3rd decl.
 				}
@@ -771,10 +803,15 @@ public class ServumVerbi {
 				ending = inflects.first;
 			count--;
 		}
-		cw.item = "";//w.form1+"MALUM";
+		cw.item = "";
 		return w;
 	}
+	//XXX TO DO: Add participles, pronouns, numerals, etc.
+	//-----END-----//
 
+	/*
+	 * Returns the form of a verbum based on num
+	 */
 	public String getForm(Verbum w, int num){
 		if(num == 1)
 			return w.form1;
@@ -785,5 +822,16 @@ public class ServumVerbi {
 
 		return w.form4;		
 	}
-
+	/*
+	 * Finds the largest value in an arraylist
+	 */
+	public static int findLargest(ArrayList<Integer> numbers){  
+		int largest = numbers.get(0);  
+		for(int s : numbers){  
+			if(s > largest){  
+				largest = s;  
+			}  
+		}  
+		return largest;
+	}
 }

@@ -38,12 +38,12 @@ public class Poet {
 	// This is a wonderful comment!
 	
 	public static void main(String[] args){
-		//comment out next 5 lines when using GraceGrammar to avoid duplicate printouts
-//		moby = new Moby("cmupronRand.txt", 
-//				"mpos.txt",
-//				"flist.txt",
-//				"infl.txt");
-//		moby.setScowlThreshold(60);
+		//printout duplicates when using GraceGrammar. Sorry.
+		moby = new Moby("cmupronRand.txt", 
+				"mpos.txt",
+				"flist.txt",
+				"infl.txt");
+		moby.setScowlThreshold(60);
 		
 		grammar = new GraceGrammar();
 		//System.out.println(grammar.makeSentence());
@@ -56,7 +56,7 @@ public class Poet {
 		//moby.printAllWords();
 		//moby.printAllVerbs();
 		//moby.shiftChoose();
-		String freeVerse = writeFreeVerseVerbs(3);
+		String freeVerse = writeFreeVerseVerbs(10);
 		System.out.println(freeVerse);
 		
 	}// hello
@@ -66,11 +66,13 @@ public class Poet {
 	//"free verse" is poetry that has neither rhyme nor meter
 	public static String writeFreeVerseVerbs(int lines){
 		String freeVerse = "";
-		for(int i = 0; i < lines; i++)
-			freeVerse = freeVerse + grammar.makeSentence() + "\n";
-		return freeVerse;
+		String lastLine = grammar.makeSentence() + moby.punctuation() + "\n";
+		for(int i = 0; i < lines - 1; i++)
+			freeVerse = freeVerse + grammar.makeSentence() + moby.punctuation2() + "\n"; //+ moby.punctuation() + "\n";
+		return "\n" + freeVerse + lastLine;
 		
 	}
+	
 	
 	public static String writeIambicPoemDumb(int iambs, int lines){
 		String poem = "";
@@ -403,6 +405,3 @@ public class Poet {
 
 
 }
-
-
-
